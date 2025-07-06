@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
 
 * {
     margin: 0;
@@ -38,12 +39,22 @@ nav {
     gap: 0.5rem;
 }
 .site-title {
-    font-size: 1.3rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: #5d4e6d;
-    letter-spacing: 1px;
-    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 2px;
+    font-family: 'Fredoka One', cursive;
+    display: flex;
+    align-items: center;
+    gap: 0.1em;
 }
+
+.empathy-e { color: #FFBC8A; } /* Naranja pastel claro */
+.empathy-m { color: #A3D8F4; } /* Azul pastel claro */
+.empathy-p { color: #A3D977; } /* Verde pastel claro */
+.empathy-a { color: #A3D8F4; } /* Azul pastel claro */
+.empathy-t { color: #FFA76C; } /* Naranjado pastel más oscurito */
+.empathy-h { color: #A3D8F4; } /* Azul pastel claro */
+.empathy-y { color: #A3D977; } /* Verde pastel claro */
 
 .nav-links {
     list-style: none;
