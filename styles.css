@@ -59,13 +59,13 @@ nav {
     text-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1px 0 #fff;
 }
 
-.empathy-e { color: #FFBC8A; } /* Naranja pastel claro */
-.empathy-m { color: #A3D8F4; } /* Azul pastel claro */
-.empathy-p { color: #A3D977; } /* Verde pastel claro */
-.empathy-a { color: #A3D8F4; } /* Azul pastel claro */
-.empathy-t { color: #FFA76C; } /* Naranjado pastel más oscurito */
-.empathy-h { color: #A3D8F4; } /* Azul pastel claro */
-.empathy-y { color: #A3D977; } /* Verde pastel claro */
+.empathy-e { color: #3A7E57; } /* Naranja pastel claro */
+.empathy-m { color: #31AB92; } /* Azul pastel claro */
+.empathy-p { color: #87A6C5; } /* Verde pastel claro */
+.empathy-a { color: #A4BFC6; } /* Azul pastel claro */
+.empathy-t { color: #ADA0BA; } /* Naranjado pastel más oscurito */
+.empathy-h { color: #BC97C0; } /* Azul pastel claro */
+.empathy-y { color: #A48CA4; } /* Verde pastel claro */
 
 .nav-links {
     list-style: none;
@@ -104,7 +104,7 @@ nav {
 
 
 .chat-button {
-    background: #0072ff;
+    background: #A48CA4;
     color: #fff !important;
     font-weight: 700;
     border-radius: 22px 22px 22px 8px;
@@ -139,7 +139,7 @@ nav {
     transition: color 0.15s, text-shadow 0.25s;
 }
 .chat-button:hover, .chat-button:focus {
-    background: #0056b3;
+    background: #A48CA4;
 }
 .chat-button:hover span, .chat-button:focus span {
     color: #4b2067 !important;
