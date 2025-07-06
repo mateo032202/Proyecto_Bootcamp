@@ -62,6 +62,3 @@ Antes de comenzar a trabajar, siempre:
 - Evitar que varias personas trabajen en el **mismo archivo al mismo tiempo**
 - Usar mensajes claros en los commits (ej: `Modifiqué el navbar`, `Corregí errores en login`)
 
----
-
-¡Listo! Ahora están preparados para trabajar de forma sincronizada en equipo. 💪
