@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
 
+
+@font-face {
+    font-family: 'Super Adorable';
+    src: url('./fonts/Super Adorable.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -39,13 +47,16 @@ nav {
     gap: 0.5rem;
 }
 .site-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
     letter-spacing: 2px;
-    font-family: 'Fredoka One', cursive;
+    font-family: 'Super Adorable', cursive;
     display: flex;
     align-items: center;
     gap: 0.1em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1px 0 #fff;
 }
 
 .empathy-e { color: #FFBC8A; } /* Naranja pastel claro */
@@ -133,4 +144,41 @@ nav {
 .chat-button:hover span, .chat-button:focus span {
     color: #4b2067 !important;
     text-shadow: 0 0 18px #b39ddb, 0 0 32px #7c3aed, 0 0 24px #4b2067;
+}
+
+.site-title .empathy-letter {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.08));
+    animation: empathy-glow 2.5s ease-in-out infinite;
+    text-shadow:
+        0 1px 2px rgba(0,0,0,0.10),
+        0 0 8px currentColor, /* brillo acorde al color */
+        0 0 2px #fff;
+}
+
+.site-title .empathy-e { animation-delay: 0s; }
+.site-title .empathy-m { animation-delay: 0.2s; }
+.site-title .empathy-p { animation-delay: 0.4s; }
+.site-title .empathy-a { animation-delay: 0.6s; }
+.site-title .empathy-t { animation-delay: 0.8s; }
+.site-title .empathy-h { animation-delay: 1s; }
+.site-title .empathy-y { animation-delay: 1.2s; }
+
+@keyframes empathy-glow {
+    0%, 100% {
+        text-shadow:
+            0 1px 2px rgba(0,0,0,0.10),
+            0 0 8px currentColor,
+            0 0 2px #fff;
+        filter: brightness(1);
+    }
+    50% {
+        text-shadow:
+            0 2px 8px rgba(0,0,0,0.13),
+            0 0 18px currentColor,
+            0 0 6px #fff;
+        filter: brightness(1.13);
+    }
 }

@@ -1,5 +1,3 @@
-
-
 document.querySelectorAll('.nav-links a:not(.chat-button)').forEach(btn => {
     btn.addEventListener('mouseenter', () => {
         btn.animate([
@@ -34,3 +32,5 @@ document.addEventListener('DOMContentLoaded', () => {
   parent.addEventListener('mouseenter', animateGlow);
   parent.addEventListener('focus', animateGlow);
 });
+
+// Ya no es necesario ningún JS para la animación de reflejo, todo es CSS.
