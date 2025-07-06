@@ -15,6 +15,8 @@
     box-sizing: border-box;
 }
 
+
+
 body {
     font-family: 'Quicksand', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f9f7f6;
@@ -182,3 +184,109 @@ nav {
         filter: brightness(1.13);
     }
 }
+
+
+/* Carta de los desarrolladores */
+#desarrolladores {
+    background: #f9f7f6;
+    padding: 40px 20px;
+    text-align: center;
+}
+.card-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+/* Estructura de la tarjeta */
+.card {
+    position: relative;
+    width: 300px;
+    height: 358px;
+    perspective: 1000px;
+}
+
+/* Contenedor que rota */
+.card .inner-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s ease;
+    transform-style: preserve-3d;
+}
+
+/* Efecto al pasar el mouse */
+.card:hover .inner-card {
+    transform: rotateY(180deg);
+}
+
+/* Caras de la tarjeta */
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Cara frontal */
+.front {
+    transform: rotateY(0deg);
+    z-index: 2;
+    box-shadow: 0 5px 10px black;
+}
+
+.front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.front h3 {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 45px;
+    line-height: 45px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, .4);
+    text-align: center;
+}
+
+/* Cara trasera */
+.back {
+    transform: rotateY(180deg);
+    background-color: rgb(3, 35, 54);
+    color: #f3f3f3;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.back h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.back p {
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+}
+
+.back .link {
+    border-top: 1px solid #f3f3f3;
+    padding-top: 10px;
+}
+
+.back .link a {
+    color: #00f;
+    text-decoration: none;
+}
+
