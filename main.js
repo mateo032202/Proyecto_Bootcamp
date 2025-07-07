@@ -140,3 +140,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// Personalización dinámica de color para testimonios
+// Permite cambiar el color de la tarjeta de testimonio seleccionada
+
+document.addEventListener('DOMContentLoaded', function () {
+    const colorPicker = document.getElementById('testimonioColorPicker');
+    const cardSelector = document.getElementById('testimonioSelector');
+    const applyBtn = document.getElementById('applyTestimonioColor');
+    if (colorPicker && cardSelector && applyBtn) {
+        applyBtn.addEventListener('click', function () {
+            const idx = parseInt(cardSelector.value, 10);
+            const color = colorPicker.value;
+            const cards = document.querySelectorAll('.testimonios-container .testimonio-card');
+            if (cards[idx]) {
+                cards[idx].style.background = `linear-gradient(135deg, ${color} 60%, #fff 100%)`;
+            }
+        });
+    }
+});
