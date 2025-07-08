@@ -1,3 +1,4 @@
+// === ANIMACIONES DE NAVEGACIÓN ===
 document.querySelectorAll('.nav-links a:not(.chat-button)').forEach(btn => {
     btn.addEventListener('mouseenter', () => {
         btn.animate([
@@ -11,151 +12,251 @@ document.querySelectorAll('.nav-links a:not(.chat-button)').forEach(btn => {
     });
 });
 
-
-
+// === ANIMACIÓN CHAT BUTTON ===
 document.addEventListener('DOMContentLoaded', () => {
-  const chatBtn = document.querySelector('.chat-button span');
-  if (!chatBtn) return;
+    const chatBtn = document.querySelector('.chat-button span');
+    if (!chatBtn) return;
 
-  function animateGlow() {
-    chatBtn.animate([
-      { textShadow: '0 0 0px #b39ddb, 0 0 0px #4b2067', color: '#4b2067' },
-      { textShadow: '0 0 18px #b39ddb, 0 0 28px #4b2067', color: '#4b2067' },
-      { textShadow: '0 0 0px #b39ddb, 0 0 0px #4b2067', color: '#4b2067' }
-    ], {
-      duration: 600,
-      easing: 'ease-in-out'
-    });
-  }
-
-  const parent = chatBtn.parentElement;
-  parent.addEventListener('mouseenter', animateGlow);
-  parent.addEventListener('focus', animateGlow);
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const crearBtn = document.getElementById('crear-testimonio');
-    if (crearBtn) {
-        crearBtn.addEventListener('click', function () {
-            mostrarModalTestimonio();
+    function animateGlow() {
+        chatBtn.animate([
+            { textShadow: '0 0 0px #b39ddb, 0 0 0px #4b2067', color: '#4b2067' },
+            { textShadow: '0 0 18px #b39ddb, 0 0 28px #4b2067', color: '#4b2067' },
+            { textShadow: '0 0 0px #b39ddb, 0 0 0px #4b2067', color: '#4b2067' }
+        ], {
+            duration: 600,
+            easing: 'ease-in-out'
         });
     }
+
+    const parent = chatBtn.parentElement;
+    parent.addEventListener('mouseenter', animateGlow);
+    parent.addEventListener('focus', animateGlow);
 });
 
-function mostrarModalTestimonio() {
-    if (document.getElementById('modal-testimonio')) return;
-    const modal = document.createElement('div');
-    modal.id = 'modal-testimonio';
-    modal.innerHTML = `
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <h3>Comparte tu historia</h3>
-            <textarea id="nueva-historia" placeholder="Escribe tu experiencia..." rows="5"></textarea>
-            <input id="nuevo-autor" type="text" placeholder="Tu nombre o seudónimo" maxlength="30" />
-            <div class="modal-actions">
-                <button id="guardar-testimonio">Guardar</button>
-                <button id="cancelar-testimonio">Cancelar</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    document.getElementById('cancelar-testimonio').onclick = () => modal.remove();
-    document.getElementById('guardar-testimonio').onclick = function () {
-        const texto = document.getElementById('nueva-historia').value.trim();
-        const autor = document.getElementById('nuevo-autor').value.trim() || 'Anónimo';
-        if (texto.length > 0) {
-            agregarTestimonio(texto, autor);
-            modal.remove();
+// === NAVEGACIÓN PRINCIPAL ===
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inicializando navegación...');
+    
+    // Función principal de navegación
+    window.navegarA = function(seccionId) {
+        console.log('📍 Navegando a:', seccionId);
+        
+        // Lista de todas las secciones
+        const secciones = ['inicio', 'nosotros', 'testimonios', 'recursos', 'contacto', 'chat'];
+        
+        // Remover clase activa de todos los enlaces de navegación
+        document.querySelectorAll('.nav-links a').forEach(enlace => {
+            enlace.classList.remove('active');
+            // Resetear estilos del botón chat si no está activo
+            if (enlace.classList.contains('chat-button')) {
+                enlace.style.background = '#A48CA4';
+                enlace.style.transform = '';
+                enlace.style.boxShadow = '';
+            }
+        });
+        
+        // Agregar clase activa al enlace correspondiente
+        const enlaceActivo = document.querySelector(`a[href="#${seccionId}"]`);
+        if (enlaceActivo) {
+            if (enlaceActivo.classList.contains('chat-button')) {
+                // Caso especial para el botón de chat
+                enlaceActivo.style.background = '#8e7aa0';
+                enlaceActivo.style.transform = 'translateY(-2px)';
+                enlaceActivo.style.boxShadow = '0 4px 15px rgba(164, 140, 164, 0.5)';
+                console.log('🟣 Chat button activo');
+            } else {
+                // Caso normal para otros enlaces
+                enlaceActivo.classList.add('active');
+                console.log('🟣 Enlace activo:', seccionId);
+            }
+        }
+        
+        // Ocultar todas las secciones
+        secciones.forEach(seccion => {
+            const elemento = document.getElementById(seccion);
+            if (elemento) {
+                elemento.style.display = 'none';
+                console.log('✅ ' + seccion + ' ocultado');
+            }
+        });
+        
+        // Mostrar la sección solicitada
+        const seccionAMostrar = document.getElementById(seccionId);
+        if (seccionAMostrar) {
+            seccionAMostrar.style.display = 'block';
+            console.log('🎯 Sección mostrada:', seccionId);
+            
+            // Scroll suave al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Si es la sección nosotros, asegurar visibilidad de las tarjetas
+            if (seccionId === 'nosotros') {
+                setTimeout(() => {
+                    const tarjetas = document.querySelectorAll('.dev-card');
+                    const contenedor = document.querySelector('.card-container');
+                    
+                    if (contenedor) {
+                        contenedor.style.display = 'flex';
+                        contenedor.style.visibility = 'visible';
+                        contenedor.style.opacity = '1';
+                        console.log('🎯 Contenedor de tarjetas forzado a visible');
+                    }
+                    
+                    tarjetas.forEach((tarjeta, index) => {
+                        tarjeta.style.display = 'flex';
+                        tarjeta.style.visibility = 'visible';
+                        tarjeta.style.opacity = '1';
+                        console.log('🎯 Tarjeta ' + (index + 1) + ' forzada a visible');
+                    });
+                }, 100);
+            }
         } else {
-            document.getElementById('nueva-historia').focus();
+            console.error('❌ Sección no encontrada:', seccionId);
         }
     };
-}
-
-function agregarTestimonio(texto, autor) {
-    const container = document.querySelector('.testimonios-container');
-    if (!container) return;
-    const card = document.createElement('div');
-    card.className = 'testimonio-card';
-    card.innerHTML = `<p class="testimonio-text">"${texto}"</p><span class="testimonio-author">- ${autor}</span>`;
-    container.insertBefore(card, container.firstChild);
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const navTestimonios = document.querySelector('a[href="#testimonios"]');
-    const testimoniosSection = document.querySelector('.testimonios-section');
-    if (navTestimonios && testimoniosSection) {
-        navTestimonios.addEventListener('click', function(e) {
+    
+    // Event listeners para todos los enlaces de navegación
+    const enlaces = document.querySelectorAll('a[href^="#"]');
+    console.log('🔗 Enlaces encontrados:', enlaces.length);
+    
+    enlaces.forEach(enlace => {
+        enlace.addEventListener('click', function(e) {
             e.preventDefault();
-            testimoniosSection.style.display = 'block';
-            testimoniosSection.scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const mainSections = [
-        document.getElementById('inicio'),
-        document.querySelector('.testimonios-section'),
-        document.getElementById('nosotros'),
-        document.getElementById('recursos'),
-        document.getElementById('contacto'),
-        // Agrega aquí otras secciones si las tienes
-    ];
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            const href = link.getAttribute('href');
-            if (href && (href === '#testimonios' || href === 'testimonios.html')) {
-                e.preventDefault();
-                mainSections.forEach(sec => {
-                    if (sec) sec.style.display = 'none';
-                });
-                const testimoniosSection = document.querySelector('.testimonios-section');
-                if (testimoniosSection) {
-                    testimoniosSection.style.display = 'block';
-                    testimoniosSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            } else if (href && href === 'nostros.html') {
-                e.preventDefault();
-                mainSections.forEach(sec => {
-                    if (sec) sec.style.display = 'none';
-                });
-                const nosotrosSection = document.getElementById('nosotros');
-                if (nosotrosSection) {
-                    nosotrosSection.style.display = 'block';
-                    nosotrosSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            } else if (href && href.startsWith('#')) {
-                e.preventDefault();
-                mainSections.forEach(sec => {
-                    if (sec) sec.style.display = 'none';
-                });
-                const target = document.querySelector(href);
-                if (target) {
-                    target.style.display = 'block';
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
+            const href = this.getAttribute('href');
+            const seccionId = href.substring(1); // Quitar el #
+            console.log('🔗 Clic en enlace:', href, '-> ID:', seccionId);
+            navegarA(seccionId);
+            return false;
         });
     });
+    
+    // Verificación de elementos
+    console.log('=== 🔍 VERIFICACIÓN DE ELEMENTOS ===');
+    console.log('Inicio:', document.getElementById('inicio') ? '✅' : '❌');
+    console.log('Nosotros:', document.getElementById('nosotros') ? '✅' : '❌');
+    console.log('Testimonios:', document.getElementById('testimonios') ? '✅' : '❌');
+    console.log('Recursos:', document.getElementById('recursos') ? '✅' : '❌');
+    console.log('Contacto:', document.getElementById('contacto') ? '✅' : '❌');
+    console.log('Chat:', document.getElementById('chat') ? '✅' : '❌');
+    console.log('================================');
+    
+    // Mostrar la sección de inicio por defecto
+    navegarA('inicio');
 });
 
-// Personalización dinámica de color para testimonios
-// Permite cambiar el color de la tarjeta de testimonio seleccionada
-
+// === FUNCIONALIDAD PARA CREAR TESTIMONIOS ===
 document.addEventListener('DOMContentLoaded', function () {
-    const colorPicker = document.getElementById('testimonioColorPicker');
-    const cardSelector = document.getElementById('testimonioSelector');
-    const applyBtn = document.getElementById('applyTestimonioColor');
-    if (colorPicker && cardSelector && applyBtn) {
-        applyBtn.addEventListener('click', function () {
-            const idx = parseInt(cardSelector.value, 10);
-            const color = colorPicker.value;
-            const cards = document.querySelectorAll('.testimonios-container .testimonio-card');
-            if (cards[idx]) {
-                cards[idx].style.background = `linear-gradient(135deg, ${color} 60%, #fff 100%)`;
+    // Contador de testimonios únicos para IDs únicos
+    let testimonioCounter = 4; // Empezamos en 4 porque ya hay 3 testimonios existentes
+    
+    const form = document.getElementById('testimonio-form');
+    const testimonioTexto = document.getElementById('testimonio-texto');
+    const charCounter = document.querySelector('.char-counter');
+    
+    // Contador de caracteres en tiempo real
+    if (testimonioTexto && charCounter) {
+        testimonioTexto.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            const maxLength = this.getAttribute('maxlength') || 250;
+            charCounter.textContent = `${currentLength}/${maxLength} caracteres`;
+            
+            // Cambiar color si se acerca al límite
+            if (currentLength > maxLength * 0.9) {
+                charCounter.style.color = '#e74c3c';
+            } else if (currentLength > maxLength * 0.7) {
+                charCounter.style.color = '#f39c12';
+            } else {
+                charCounter.style.color = '#7f8c8d';
             }
         });
+    }
+    
+    // Funcionalidad del formulario
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('testimonio-nombre').value.trim();
+            const texto = document.getElementById('testimonio-texto').value.trim();
+            const color = document.getElementById('testimonio-color').value;
+            
+            if (!nombre || !texto) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+            
+            if (texto.length > 250) {
+                alert('El testimonio no puede exceder los 250 caracteres.');
+                return;
+            }
+            
+            crearNuevoTestimonio(nombre, texto, color);
+            
+            // Limpiar formulario
+            form.reset();
+            if (charCounter) {
+                charCounter.textContent = '0/250 caracteres';
+                charCounter.style.color = '#7f8c8d';
+            }
+            
+            // Mensaje de confirmación
+            alert('¡Testimonio creado exitosamente!');
+        });
+    }
+    
+    function crearNuevoTestimonio(nombre, texto, colorFirma) {
+        const template = document.getElementById('sobre-template');
+        const container = document.querySelector('.testimonios-container');
+        
+        if (!template || !container) {
+            console.error('Template o container no encontrado');
+            return;
+        }
+        
+        // Clonar el template
+        const nuevoTestimonio = template.cloneNode(true);
+        nuevoTestimonio.style.display = 'block';
+        nuevoTestimonio.removeAttribute('id');
+        
+        // Crear IDs únicos para los filtros y gradientes
+        const uniqueId = testimonioCounter++;
+        const newSVG = nuevoTestimonio.querySelector('svg');
+        
+        // Actualizar IDs de filtros y gradientes para evitar conflictos
+        const filters = newSVG.querySelectorAll('filter, linearGradient, radialGradient');
+        filters.forEach(filter => {
+            const oldId = filter.id;
+            const newId = oldId + uniqueId;
+            filter.id = newId;
+            
+            // Actualizar referencias a estos IDs
+            const references = newSVG.querySelectorAll(`[filter="url(#${oldId})"], [fill="url(#${oldId})"]`);
+            references.forEach(ref => {
+                if (ref.getAttribute('filter')) {
+                    ref.setAttribute('filter', `url(#${newId})`);
+                }
+                if (ref.getAttribute('fill')) {
+                    ref.setAttribute('fill', `url(#${newId})`);
+                }
+            });
+        });
+        
+        // Actualizar el contenido del testimonio
+        const contenidoDiv = nuevoTestimonio.querySelector('.testimonio-contenido');
+        if (contenidoDiv) {
+            contenidoDiv.textContent = `"${texto}"`;
+        }
+        
+        // Actualizar la firma con el nombre y color seleccionado
+        const firmaText = nuevoTestimonio.querySelector('.firma-manuscrita');
+        if (firmaText) {
+            firmaText.textContent = nombre;
+            firmaText.setAttribute('fill', colorFirma);
+        }
+        
+        // Agregar el nuevo testimonio al container
+        container.appendChild(nuevoTestimonio);
+        
+        console.log('Nuevo testimonio creado:', nombre);
     }
 });
