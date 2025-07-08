@@ -260,3 +260,61 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Nuevo testimonio creado:', nombre);
     }
 });
+
+
+// EVENTOS PARA SECCIÓN DE CONTACTO
+document.addEventListener("DOMContentLoaded", () => {
+    const contactoBtn = document.querySelector('a[href="#contacto"]');
+    const contactoSeccion = document.querySelector("#contacto");
+    const form = document.querySelector(".contact-form");
+  
+  
+    if (contactoBtn && contactoSeccion) {
+      contactoBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        contactoSeccion.classList.remove("hidden");
+        contactoSeccion.classList.add("fade-in");
+        contactoSeccion.scrollIntoView({ behavior: "smooth" });
+        if (destino !== "#contacto") {
+            contactoSeccion.classList.add("hidden");
+            contactoSeccion.classList.remove("fade-in");
+          }
+          form.reset();
+          contactoSeccion.classList.add("hidden");
+          contactoSeccion.classList.remove("fade-in");
+          
+
+      });
+    }
+  
+  
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const destino = e.target.getAttribute('href');
+        if (destino !== "#contacto") {
+          contactoSeccion.classList.add("hidden");
+        }
+      });
+    });
+  
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+          
+            const nombre = form.querySelector("#nombre").value; 
+            const edad = form.querySelector("#edad").value;
+            const whatsapp = form.querySelector("#whatsapp").value;
+            const email = form.querySelector("#email").value;
+            const situacion = form.querySelector("#situacion").value;
+          
+          
+            alert("Gracias por contactarnos 💜\nTe responderemos pronto.");
+          
+            form.reset();
+            contactoSeccion.classList.add("hidden");
+            contactoSeccion.classList.remove("fade-in");
+          });
+          
+    }
+  });
+  
