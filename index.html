@@ -747,7 +747,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="testimonio-ribbon">Ana M.</div>
                 </div>
                 
                 <!-- TARJETA KAREN -->
@@ -780,49 +779,83 @@
                 </div>
             </div>
         </section>
-                    <div class="testimonio-ribbon">Carlos G.</div>
-                </div>
-                <div class="testimonio-card testimonio-color-rosa">
-                    <div class="testimonio-cover">
-                        <img src="images/logo.png" alt="Oso Empathy" />
-                    </div>
-                    <div class="testimonio-content">
-                        <p class="testimonio-text">"Después de un accidente, pensé que no podría volver a caminar. Con
-                            esfuerzo y ayuda, logré recuperarme y aprendí a valorar cada paso."</p>
-                    </div>
-                    <div class="testimonio-ribbon">Lucía R.</div>
-                </div>
-                
-            </div>
-        </div>
-    </section>
 
     <!-- Sección de Recursos -->
     <section id="recursos" style="display:none;">
-        <div style="min-height: 80vh; padding: 40px 20px; background: linear-gradient(135deg, #f6e5f5, #e8f0ff);">
-            <h2 style="font-family: 'Super Adorable', cursive; font-size: 3rem; color: #5d4e6d; text-align: center; margin-bottom: 40px;">Recursos</h2>
+        <div>
+            <h2>Recursos de Bienestar</h2>
             <div style="max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                <p style="font-size: 1.1rem; color: #555; line-height: 1.8; text-align: center;">Aquí encontrarás recursos útiles para tu bienestar emocional.</p>
+                <h3 style="color: #5d4e6d; margin-bottom: 30px; text-align: center;">Herramientas para tu Bienestar</h3>
+                <div class="grid-recursos">
+                    <div class="recurso-card">
+                        <h4>🧘‍♀️ Meditación</h4>
+                        <p style="color: #555;">Técnicas de relajación y mindfulness para reducir el estrés y la ansiedad.</p>
+                    </div>
+                    <div class="recurso-card">
+                        <h4>📚 Recursos Educativos</h4>
+                        <p style="color: #555;">Artículos y guías sobre salud mental y bienestar emocional.</p>
+                    </div>
+                    <div class="recurso-card">
+                        <h4>🤝 Apoyo Comunitario</h4>
+                        <p style="color: #555;">Conecta con personas que comparten experiencias similares.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-empathy">Explorar Recursos</button>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Sección de Contacto -->
     <section id="contacto" style="display:none;">
-        <div style="min-height: 80vh; padding: 40px 20px; background: linear-gradient(135deg, #f6e5f5, #e8f0ff);">
-            <h2 style="font-family: 'Super Adorable', cursive; font-size: 3rem; color: #5d4e6d; text-align: center; margin-bottom: 40px;">Contacto</h2>
-            <div style="max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                <p style="font-size: 1.1rem; color: #555; line-height: 1.8; text-align: center;">¿Necesitas ayuda? Estamos aquí para apoyarte.</p>
+        <div>
+            <h2>Contáctanos</h2>
+            <div>
+                <div class="contact-section">
+                    <h3 style="text-align: center; color: #5d4e6d; margin-bottom: 30px;">¿Necesitas ayuda? Estamos aquí para apoyarte</h3>
+                    <form class="contact-form">
+                        <div class="form-container">
+                            <div>
+                                <label for="nombre">Nombre:</label>
+                                <input type="text" id="nombre" name="nombre" required>
+
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" name="email" required>
+
+                                <label for="asunto">Asunto:</label>
+                                <input type="text" id="asunto" name="asunto" required>
+
+                                <label for="mensaje">Mensaje:</label>
+                                <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos cómo podemos ayudarte..." required></textarea>
+
+                                <button type="submit">Enviar Mensaje</button>
+                            </div>
+                            <img src="images/avatar1.jpg" alt="Contacto" class="form-image-lateral">
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Sección de Chat -->
     <section id="chat" style="display:none;">
-        <div style="min-height: 80vh; padding: 40px 20px; background: linear-gradient(135deg, #f6e5f5, #e8f0ff);">
-            <h2 style="font-family: 'Super Adorable', cursive; font-size: 3rem; color: #5d4e6d; text-align: center; margin-bottom: 40px;">Chat en Vivo</h2>
+        <div>
+            <h2>Chat en Vivo</h2>
             <div style="max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                <p style="font-size: 1.1rem; color: #555; line-height: 1.8; text-align: center;">Conéctate con nuestro equipo de apoyo.</p>
+                <div class="chat-info">
+                    <h3 style="margin-bottom: 15px;">💬 Apoyo Inmediato</h3>
+                    <p style="margin-bottom: 20px;">Nuestro equipo de profesionales está disponible para brindarte apoyo emocional cuando lo necesites.</p>
+                    <div class="horario-info">
+                        <p><strong>Horario de atención:</strong></p>
+                        <p>Lunes a Viernes: 9:00 AM - 8:00 PM</p>
+                        <p>Sábados: 10:00 AM - 6:00 PM</p>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn-empathy">Iniciar Chat</button>
+                </div>
             </div>
         </div>
     </section>

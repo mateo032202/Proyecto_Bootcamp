@@ -1119,3 +1119,16 @@ nav {
         transform: translateY(0);
     }
 }
+
+/* === ELIMINACIÓN ESPECÍFICA DEL TEXTO "ANA M." PROBLEMÁTICO === */
+
+/* Ocultar específicamente elementos de testimonio que aparezcan fuera de la sección testimonios */
+#nosotros svg text[font-family*="Great Vibes"],
+#nosotros svg text[font-family*="Dancing Script"],
+#nosotros .testimonio-firma,
+#nosotros [class*="testimonio"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+
