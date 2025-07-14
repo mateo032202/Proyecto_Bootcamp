@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Empathy</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles_new.css" />
+    <link rel="stylesheet" href="styles_carta.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
     <script src="main.js" defer></script>
+    <script src="carta-gsap-fixed.js" defer></script>
 </head>
 
 <body>
@@ -182,22 +186,22 @@
                     <!-- Solapa del sobre que se abre en hover -->
                     <g class="solapa-sobre" transform-origin="200 120">
                         <!-- Tapa cerrada del sobre -->
-                        <polygon points="80,120 200,40 320,120" fill="url(#gradienteTapa1)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre1)"/>
+                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa1)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre1)"/>
                         
                         <!-- Línea de sellado -->
                         <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
                         
                         <!-- Sombra interior de sellado -->
-                        <polygon points="80,120 200,40 320,120 300,110 200,55 100,110" fill="#d0d0d0" opacity="0.6"/>
+                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
                         
                         <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
-                        <circle cx="200" cy="190" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello1)" opacity="0.95"/>
-                        <circle cx="200" cy="190" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="172" width="36" height="36" href="images/logo.png" opacity="0.9"/>
+                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello1)" opacity="0.95"/>
+                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
+                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
                     </g>
                     
                     <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
-                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(-3 110 240)">
+                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(3 110 240)">
                         María González
                     </text>
                 </svg>
@@ -323,18 +327,18 @@
                     <!-- Solapa del sobre que se abre en hover -->
                     <g class="solapa-sobre" transform-origin="200 120">
                         <!-- Tapa cerrada del sobre -->
-                        <polygon points="80,120 200,40 320,120" fill="url(#gradienteTapa2)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre2)"/>
+                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa2)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre2)"/>
                         
                         <!-- Línea de sellado -->
                         <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
                         
                         <!-- Sombra interior de sellado -->
-                        <polygon points="80,120 200,40 320,120 300,110 200,55 100,110" fill="#d0d0d0" opacity="0.6"/>
+                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
                         
                         <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
-                        <circle cx="200" cy="190" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello2)" opacity="0.95"/>
-                        <circle cx="200" cy="190" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="172" width="36" height="36" href="images/logo.png" opacity="0.9"/>
+                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello2)" opacity="0.95"/>
+                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
+                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
                     </g>
                     
                     <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
@@ -464,18 +468,18 @@
                     <!-- Solapa del sobre que se abre en hover -->
                     <g class="solapa-sobre" transform-origin="200 120">
                         <!-- Tapa cerrada del sobre -->
-                        <polygon points="80,120 200,40 320,120" fill="url(#gradienteTapa3)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre3)"/>
+                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa3)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre3)"/>
                         
                         <!-- Línea de sellado -->
                         <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
                         
                         <!-- Sombra interior de sellado -->
-                        <polygon points="80,120 200,40 320,120 300,110 200,55 100,110" fill="#d0d0d0" opacity="0.6"/>
+                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
                         
                         <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
-                        <circle cx="200" cy="190" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello3)" opacity="0.95"/>
-                        <circle cx="200" cy="190" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="172" width="36" height="36" href="images/logo.png" opacity="0.9"/>
+                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello3)" opacity="0.95"/>
+                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
+                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
                     </g>
                     
                     <!-- Firma manuscrita en la parte inferior izquierda del sobre -->

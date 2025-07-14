@@ -1,0 +1,85 @@
+/* Estilos para el overlay y las animaciones de cartas */
+.carta-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Asegura que las cartas animadas sean visibles */
+.carta-animada,
+.carta-animada-contenedor {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    z-index: 10000;
+    position: fixed;
+}
+
+/* Botón de cerrar */
+.cerrar-carta {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.cerrar-carta:hover {
+    transform: scale(1.1);
+    color: #7b5e9b;
+}
+
+/* Efectos de elevación para las cartas */
+.carta-animada-contenedor {
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    transform-origin: center;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Efectos específicos para el contenido de las cartas */
+.carta-animada-contenedor h3 {
+    color: #5d4e6d;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.carta-animada-contenedor p {
+    color: #333;
+    line-height: 1.7;
+}
+
+/* Estilos para los elementos decorativos */
+.carta-decoracion {
+    opacity: 0.5;
+    position: absolute;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+    .carta-animada-contenedor {
+        width: 95% !important;
+        max-width: 450px !important;
+        padding: 25px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .carta-animada-contenedor {
+        width: 95% !important;
+        max-width: 350px !important;
+        padding: 20px !important;
+    }
+    
+    .carta-animada-contenedor h3 {
+        font-size: 22px !important;
+    }
+    
+    .carta-animada-contenedor p {
+        font-size: 14px !important;
+    }
+}
