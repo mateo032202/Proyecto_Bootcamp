@@ -70,15 +70,38 @@ function ejecutarAnimacionCompleta(sobre) {
         console.error('❌ No se encontró contenido de carta');
         return;
     }
-    
+
     const foreignObject = carta.querySelector('foreignObject div');
     const firmaElement = sobre.querySelector('text');
     
     let textoTestimonio = foreignObject ? foreignObject.textContent.trim() : 'Sin contenido';
     let nombreFirma = firmaElement ? firmaElement.textContent.trim() : 'Anónimo';
     
+    // Detectar color personalizado del testimonio (desde la firma o elementos SVG)
+    let colorPersonalizado = '#5d4e6d'; // Color por defecto
+    if (firmaElement) {
+        const fillColor = firmaElement.getAttribute('fill');
+        if (fillColor && fillColor !== '#1A237E') { // Si no es el color por defecto
+            colorPersonalizado = fillColor;
+        }
+    }
+    
     console.log('📝 Animando:', textoTestimonio.substring(0, 50) + '...');
     console.log('✍️ Firma:', nombreFirma);
+    console.log('🎨 Color detectado:', colorPersonalizado);
+    
+    // Detectar color personalizado de la carta (desde atributos data o elementos SVG)
+    let colorCarta = '#d1c1e0'; // Color por defecto de la carta
+    
+    // Intentar obtener el color de la carta desde un atributo data del sobre
+    const colorCartaData = sobre.getAttribute('data-color-carta');
+    if (colorCartaData) {
+        colorCarta = colorCartaData;
+    }
+    
+    // Convertir color de la carta a pastel
+    const colorCartaPastel = convertirColorAPastel(colorCarta);
+    console.log('🎨 Color de carta detectado:', colorCarta, '→', colorCartaPastel);
     
     // Crear elemento de carta animada
     const cartaAnimada = document.createElement('div');
@@ -117,15 +140,20 @@ function ejecutarAnimacionCompleta(sobre) {
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         ">${nombreFirma}</div>
         <div style="
-            border: 2px solid #d1c1e0;
+            border: 2px solid ${colorCartaPastel};
             border-radius: 8px;
             padding: 20px;
-            background-color: white;
+            background-color: ${colorCartaPastel};
             position: relative;
+            height: 250px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         ">
             <div style="
                 font-size: 40px;
-                color: #d1c1e0;
+                color: ${colorCartaPastel};
                 position: absolute;
                 top: 10px;
                 left: 15px;
@@ -133,19 +161,27 @@ function ejecutarAnimacionCompleta(sobre) {
             ">❝</div>
             <p style="
                 font-family: 'Quicksand', sans-serif;
-                font-size: 16px;
-                line-height: 1.6;
+                font-size: 14px;
+                line-height: 1.4;
                 color: #333;
-                text-align: center;
-                margin: 25px 0 15px 0;
+                text-align: justify;
+                margin: 25px 0 10px 0;
                 padding: 10px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
+                flex: 1;
+                overflow-y: auto;
+                box-sizing: border-box;
             ">${textoTestimonio}</p>
             <div style="
                 font-family: 'Great Vibes', 'Dancing Script', cursive;
-                font-size: 20px;
-                color: #5d4e6d;
+                font-size: 18px;
+                color: ${colorPersonalizado};
                 text-align: right;
-                margin-top: 15px;
+                margin-top: auto;
+                padding-top: 10px;
+                flex-shrink: 0;
             ">— ${nombreFirma}</div>
         </div>
     `;
@@ -153,7 +189,7 @@ function ejecutarAnimacionCompleta(sobre) {
     // Estilos iniciales - carta como cuadrado pequeño desde el inicio
     cartaAnimada.style.cssText = `
         position: fixed !important;
-        background: white !important;
+        background: ${colorCartaPastel} !important;
         border-radius: 12px !important;
         box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
         padding: 15px !important;
@@ -240,15 +276,15 @@ function ejecutarAnimacionCompleta(sobre) {
         // Deshabilitar pointer events
         cartaAnimada.style.pointerEvents = 'none';
         
-        // Crear timeline para el regreso
+        // Crear timeline para el regreso estilo Windows 11
         const tlRegreso = gsap.timeline({
             defaults: {ease: 'power2.inOut'},
             onComplete: function() {
-                console.log('🎬 Animación de regreso completada');
+                console.log('🎬 Animación de regreso estilo Windows 11 completada');
                 // Cerrar el sobre después de completar la animación
                 setTimeout(function() {
                     cerrarSobre(sobre);
-                }, 500);
+                }, 300);
             }
         });
 
@@ -260,51 +296,25 @@ function ejecutarAnimacionCompleta(sobre) {
             ease: "back.in(1.7)"
         });
 
-        // 4. Contraer de cuadrado grande a cuadrado pequeño
+        // Animación de minimización estilo Windows 11
+        // 1. Contraer y mover hacia el sobre original
         tlRegreso.to(cartaAnimada, {
-            duration: 0.8,
-            left: centerX + 'px',
-            top: centerY + 'px',
-            width: '150px',
-            height: '150px',
-            padding: '15px',
-            borderRadius: '12px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-            scale: 1.1,
-            ease: "power2.inOut",
-            onStart: function() {
-                cartaAnimada.style.overflow = 'hidden';
-            }
-        })
-        // 5. Regresar al sobre con animación realista de ingreso
-        .to(cartaAnimada, {
-            duration: 1.2,
+            duration: 0.5,
             left: startX + 'px',
             top: startY + 'px',
-            scale: 0.7, // Hacerla más pequeña para que quepa en el sobre
-            opacity: 1,
-            ease: "power2.inOut"
-        })
-        // 6. Simular el ingreso al sobre - deslizar hacia abajo y reducir escala
-        .to(cartaAnimada, {
-            duration: 0.8,
-            y: "+=40", // Deslizar hacia abajo para simular que entra al sobre
-            scaleX: 0.6, // Comprimir horizontalmente como si entrara por la abertura
-            scaleY: 0.4, // Comprimir verticalmente
-            opacity: 0.7,
-            ease: "power2.in",
-            transformOrigin: "center top" // El punto de referencia es la parte superior
-        })
-        // 7. Desaparecer completamente dentro del sobre
-        .to(cartaAnimada, {
-            duration: 0.4,
-            y: "+=20", // Un poco más hacia abajo
-            scale: 0.2,
+            width: '60px',
+            height: '40px',
+            scale: 0.05,
             opacity: 0,
-            ease: "power3.in",
+            borderRadius: '50px', // Efecto de contracción circular
+            ease: "power2.inOut",
+            transformOrigin: "center center",
+            onStart: function() {
+                cartaAnimada.style.overflow = 'hidden';
+            },
             onComplete: function() {
                 cartaAnimada.remove();
-                console.log('🗑️ Carta ingresada al sobre y eliminada');
+                console.log('🗑️ Carta minimizada al sobre estilo Windows 11');
             }
         });
     });
@@ -318,3 +328,65 @@ function cerrarSobre(sobre) {
     
     console.log('✅ Sobre cerrado');
 }
+
+// Función para convertir color a pastel (igual que en main.js)
+function convertirColorAPastel(hexColor) {
+    // Convertir hex a RGB
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+    
+    // Factor de mezcla: 0.6 significa 60% color original + 40% blanco
+    const factor = 0.6;
+    const white = 255;
+    
+    const rPastel = Math.round(r * factor + white * (1 - factor));
+    const gPastel = Math.round(g * factor + white * (1 - factor));
+    const bPastel = Math.round(b * factor + white * (1 - factor));
+    
+    // Convertir de vuelta a hex
+    const toHex = (n) => n.toString(16).padStart(2, '0');
+    
+    return `#${toHex(rPastel)}${toHex(gPastel)}${toHex(bPastel)}`;
+}
+
+// Exponer funciones globalmente para que puedan ser usadas desde main.js
+window.abrirSobre = abrirSobre;
+window.ejecutarAnimacionCompleta = ejecutarAnimacionCompleta;
+window.inicializarAnimacionesCartas = inicializarAnimacionesCartas;
+
+// Función para configurar animación GSAP en un sobre específico
+window.configurarAnimacionSobre = function(sobre) {
+    if (!sobre || sobre.dataset.gsapConfigured) {
+        console.log('⚠️ Sobre ya configurado o no válido');
+        return;
+    }
+    
+    console.log('🎯 Configurando animación GSAP para nuevo sobre...');
+    
+    sobre.dataset.gsapConfigured = 'true';
+    sobre.style.cursor = 'pointer';
+    
+    sobre.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🎯 Click en sobre personalizado');
+        
+        // Evitar múltiples animaciones
+        if (document.querySelector('.carta-animada')) {
+            console.log('⏸️ Animación en curso, ignorando click');
+            return;
+        }
+        
+        // Primero animar la apertura del sobre (CSS puro)
+        abrirSobre(sobre);
+        
+        // Después ejecutar la animación de la carta con GSAP
+        setTimeout(function() {
+            ejecutarAnimacionCompleta(sobre);
+        }, 800);
+    });
+    
+    console.log('✅ Animación GSAP configurada en nuevo sobre');
+};

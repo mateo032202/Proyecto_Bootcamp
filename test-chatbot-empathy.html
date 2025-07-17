@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chatbot Empathy - Violet</title>
+    
+    <!-- Estilo del chat de n8n -->
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    
+    <!-- Estilos personalizados para Empathy -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #f6e5f5 0%, #e8f0ff 100%);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(93, 63, 211, 0.15);
+            border: 1px solid #e8e0ff;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #5D3FD3;
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+            font-weight: bold;
+        }
+
+        .header p {
+            color: #7f7f7f;
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .status-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-container {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #e8e0ff;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #fafafa;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ajustes específicos para el chatbot n8n en la página de pruebas */
+        #n8n-chat-container {
+            height: 100% !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background: white !important;
+            overflow: hidden !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        #n8n-chat-container > div,
+        #n8n-chat-container > div > div {
+            height: 100% !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+        }
+
+        #n8n-chat-container [data-testid="chat-container"], 
+        #n8n-chat-container .chat-container,
+        #n8n-chat-container .n8n-chat-widget {
+            height: 100% !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background: white !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        #n8n-chat-container .chat-messages,
+        #n8n-chat-container [data-testid="chat-messages"] {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            padding: 10px 15px !important;
+            background: white !important;
+        }
+
+        #n8n-chat-container .chat-input,
+        #n8n-chat-container [data-testid="chat-input"] {
+            flex-shrink: 0 !important;
+            padding: 10px 15px !important;
+            background: white !important;
+            border-top: 1px solid #e0e0e0 !important;
+        }
+
+        /* Forzar ocupación completa del espacio */
+        #n8n-chat-container > div:first-child,
+        #n8n-chat-container > div:only-child {
+            height: 100% !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+        }
+
+        .info-section {
+            background: rgba(93, 63, 211, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #5D3FD3;
+        }
+
+        .info-section h3 {
+            color: #5D3FD3;
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .info-section p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(93, 63, 211, 0.3);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #5D3FD3;
+            font-size: 1.1em;
+        }
+
+        .loading::before {
+            content: "💜";
+            margin-right: 10px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💜 Violet</h1>
+            <p>Tu compañera de apoyo emocional</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator"></div>
+            <span id="status-text">Disponible - Horario: 08:00 AM - 08:00 PM</span>
+        </div>
+
+        <div class="chat-container">
+            <div id="n8n-chat-container">
+                <div class="loading">Violet se está preparando para ti...</div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>Sobre Violet</h3>
+            <p>Violet es tu compañera de apoyo emocional, diseñada para ofrecerte un espacio seguro donde puedas expresar tus sentimientos sin juicios. Habla con comprensión, calidez y respeto, siempre validando tus emociones.</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="reiniciarChat()">🔄 Reiniciar</button>
+            <button class="btn" onclick="mostrarInfo()">ℹ️ Info</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        let chatInicializado = false;
+
+        // Función para actualizar el estado del horario
+        function actualizarEstadoHorario() {
+            const ahora = new Date();
+            const hora = ahora.getHours();
+            const enHorario = hora >= 8 && hora < 20;
+            
+            const statusIndicator = document.querySelector('.status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (enHorario) {
+                statusIndicator.style.backgroundColor = '#4CAF50';
+                statusText.textContent = 'Violet está disponible - Horario: 08:00 AM - 08:00 PM';
+            } else {
+                statusIndicator.style.backgroundColor = '#FF9800';
+                statusText.textContent = 'Violet responderá pronto - Horario: 08:00 AM - 08:00 PM';
+            }
+        }
+
+        // Función para inicializar el chatbot
+        function inicializarChatbot() {
+            if (chatInicializado) return;
+
+            try {
+                const container = document.getElementById('n8n-chat-container');
+                
+                createChat({
+                    webhookUrl: 'https://karenospi.app.n8n.cloud/webhook/d922a1f4-8307-4ca7-9f6e-1a600c7f0a64/chat',
+                    webhookConfig: {
+                        method: 'POST',
+                        headers: {}
+                    },
+                    target: '#n8n-chat-container',
+                    mode: 'embedded',
+                    chatInputKey: 'chatInput',
+                    chatSessionKey: 'sessionId',
+                    loadPreviousSession: true,
+                    metadata: {},
+                    showWelcomeScreen: false,
+                    defaultLanguage: 'es',
+                    initialMessages: [
+                        'Hola! 👋',
+                        'Soy 𝑽𝒊𝒐𝒍𝒆𝒕. ¿Quieres contarme cómo te sientes hoy?'
+                    ],
+                    i18n: {
+                        es: {
+                            title: 'Empathy - Apoyo Emocional',
+                            subtitle: 'Bienvenid@ a tu espacio seguro 💜',
+                            footer: 'Horario: Lunes a domingo, 08:00 AM - 08:00 PM',
+                            getStarted: 'Nueva conversación',
+                            inputPlaceholder: 'Cuéntame cómo te sientes...',
+                            chatPlaceholder: 'Escribe tu mensaje aquí...',
+                            welcome: {
+                                title: 'Hola! Soy Violet 💜',
+                                subtitle: 'Tu compañera de apoyo emocional'
+                            }
+                        }
+                    }
+                });
+
+                // Aplicar ajustes de alineación después de cargar
+                setTimeout(() => {
+                    ajustarEstilosChatbot();
+                }, 500);
+
+                chatInicializado = true;
+                console.log('✅ Chatbot Violet inicializado correctamente');
+
+            } catch (error) {
+                console.error('❌ Error al inicializar:', error);
+                document.getElementById('n8n-chat-container').innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #5D3FD3; font-family: Arial, sans-serif;">
+                        <div style="margin-bottom: 10px;">💜</div>
+                        <div>Violet no pudo conectarse. Por favor, intenta más tarde.</div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                            Si necesitas ayuda inmediata, contacta: WhatsApp 35081676**
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para ajustar estilos del chatbot
+        function ajustarEstilosChatbot() {
+            try {
+                const container = document.getElementById('n8n-chat-container');
+                if (!container) return;
+                
+                container.style.cssText = `
+                    height: 100% !important;
+                    width: 100% !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    background: white !important;
+                    overflow: hidden !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                `;
+                
+                // Aplicar estilos a elementos internos
+                const chatElements = container.querySelectorAll('*');
+                chatElements.forEach(element => {
+                    if (element.classList.contains('chat-container') || 
+                        element.getAttribute('data-testid') === 'chat-container') {
+                        element.style.cssText = `
+                            height: 100% !important;
+                            width: 100% !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            background: white !important;
+                            border-radius: 0 !important;
+                            box-shadow: none !important;
+                        `;
+                    }
+                });
+                
+                console.log('✅ Estilos de alineación aplicados en pruebas');
+            } catch (error) {
+                console.error('❌ Error al ajustar estilos:', error);
+            }
+        }
+
+        // Función para reiniciar el chat
+        window.reiniciarChat = function() {
+            chatInicializado = false;
+            document.getElementById('n8n-chat-container').innerHTML = `
+                <div class="loading">Reiniciando conversación con Violet...</div>
+            `;
+            setTimeout(inicializarChatbot, 1000);
+        };
+
+        // Función para mostrar información
+        window.mostrarInfo = function() {
+            alert(`💜 Violet - Compañera de Apoyo Emocional
+
+🕐 Horario: Lunes a domingo, 08:00 AM - 08:00 PM
+
+📱 Contacto de emergencia: WhatsApp 35081676**
+
+💝 Empathy - Reduciendo el porcentaje de suicidios en el siglo XXI, brindando contención emocional real, comprensiva y respetuosa.
+
+🌟 Violet está aquí para escucharte sin juzgar, validar tus emociones y ofrecerte el apoyo que necesitas.`);
+        };
+
+        // Inicializar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Inicializando test de chatbot Empathy...');
+            actualizarEstadoHorario();
+            setInterval(actualizarEstadoHorario, 60000); // Actualizar cada minuto
+            setTimeout(inicializarChatbot, 1500); // Dar tiempo para cargar
+        });
+    </script>
+</body>
+</html>

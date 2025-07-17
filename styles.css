@@ -3,6 +3,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,400;1,600;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,400;1,600;1,700;1,800;1,900&display=swap');
 
 @font-face {
     font-family: 'Super Adorable';
@@ -40,11 +43,48 @@ body {
 header {
     background: linear-gradient(135deg, #f6e5f5, #e8f0ff);
     color: #5d4e6d;
-    padding: 1rem 2rem;
+    padding: 1.2rem 2rem; /* Aumentar padding vertical para más espacio */
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* === ESTILOS PARA CONTENIDO DE CARTAS - RESTRICCIÓN MÁXIMA === */
+.testimonio-contenido {
+    font-family: 'Quicksand', sans-serif !important;
+    color: #333 !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    overflow: hidden !important;
+    max-height: 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2px !important;
+    margin: 0 !important;
+}
+
+/* Asegurar que el foreignObject tenga dimensiones fijas */
+svg foreignObject {
+    overflow: hidden !important;
+    width: 180px !important;
+    height: 70px !important;
+}
+
+/* Contenido dentro del foreignObject */
+foreignObject div {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 nav {
@@ -53,6 +93,7 @@ nav {
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
+    gap: 2rem; /* Agregar espacio entre logo y navegación */
 }
 
 .nav-logo {
@@ -71,7 +112,29 @@ nav {
     gap: 0.1em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1px 0 #fff;
+    /* Eliminar completamente todos los efectos */
+    text-shadow: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+}
+
+/* Asegurar que no haya efectos en hover */
+.site-title:hover,
+.site-title:hover .empathy-letter,
+.site-title:hover .empathy-e,
+.site-title:hover .empathy-m,
+.site-title:hover .empathy-p,
+.site-title:hover .empathy-a,
+.site-title:hover .empathy-t,
+.site-title:hover .empathy-h,
+.site-title:hover .empathy-y {
+    text-shadow: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
 }
 
 .empathy-letter,
@@ -86,9 +149,12 @@ nav {
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
-    text-shadow: none;
-    animation: none;
-    filter: none;
+    text-shadow: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    /* Eliminar cualquier efecto de neón o iluminación */
 }
 
 .empathy-e { color: #71f38f; }
@@ -102,9 +168,10 @@ nav {
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem; /* Reducir un poco el gap entre enlaces */
     align-items: center;
     margin-left: auto;
+    flex-wrap: wrap; /* Permitir wrap en pantallas pequeñas */
 }
 
 .nav-links a {
@@ -112,9 +179,10 @@ nav {
     color: #5d4e6d;
     font-weight: 600;
     transition: color 0.3s ease;
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem; /* Aumentar padding para mejor espaciado */
     border-radius: 8px;
     transition: all 0.3s ease;
+    white-space: nowrap; /* Evitar que se rompan las líneas */
 }
 
 .nav-links a:hover {
@@ -185,54 +253,40 @@ nav {
     position: relative;
     display: inline-block;
     overflow: visible;
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.06));
-    animation: empathy-glow 2.8s ease-in-out infinite;
-    text-shadow:
-        0 1px 2px rgba(0,0,0,0.08),
-        0 0 4px currentColor,
-        0 0 1px #fff;
+    /* Eliminar completamente todos los efectos de neón */
+    animation: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
 }
 
-.site-title .empathy-e { animation-delay: 0s; }
-.site-title .empathy-m { animation-delay: 0.2s; }
-.site-title .empathy-p { animation-delay: 0.4s; }
-.site-title .empathy-a { animation-delay: 0.6s; }
-.site-title .empathy-t { animation-delay: 0.8s; }
-.site-title .empathy-h { animation-delay: 1s; }
-.site-title .empathy-y { animation-delay: 1.2s; }
+/* Delays de animación removidos */
 
-@keyframes empathy-glow {
-    0%, 100% {
-        text-shadow:
-            0 1px 2px rgba(0,0,0,0.08),
-            0 0 4px currentColor,
-            0 0 1px #fff;
-        filter: brightness(1);
-    }
-    50% {
-        text-shadow:
-            0 1px 2px rgba(0,0,0,0.08),
-            0 0 8px currentColor,
-            0 0 12px currentColor,
-            0 0 1px #fff;
-        filter: brightness(1.2);
-    }
-}
+/* Animación de brillo removida */
 
 /* Navegación responsiva */
 @media (max-width: 768px) {
+    header {
+        padding: 1rem; /* Reducir padding en móviles */
+    }
     nav {
         flex-direction: column;
         align-items: center;
-        padding: 1rem;
+        gap: 1rem; /* Espacio entre logo y navegación en móviles */
     }
     .nav-links {
-        margin-top: 1rem;
+        margin-top: 0; /* Quitar margin-top ya que usamos gap */
         flex-wrap: wrap;
         justify-content: center;
+        gap: 0.5rem; /* Menor gap en móviles */
     }
     .nav-links li {
-        margin: 0.5rem;
+        margin: 0.3rem; /* Reducir margin */
+    }
+    .nav-links a {
+        padding: 0.4rem 0.8rem; /* Reducir padding en móviles */
+        font-size: 0.9rem; /* Texto un poco más pequeño */
     }
     .site-title {
         font-size: 2rem;
@@ -339,13 +393,35 @@ nav {
     min-height: 100vh;
 }
 
-.testimonios-section h2 {
-    font-family: 'Super Adorable', cursive;
-    font-size: 3rem;
-    color: #5d4e6d;
-    text-align: center;
-    margin-bottom: 50px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+@keyframes smoothSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInGradual {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.8;
+    }
+}
+
+@keyframes modernFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .testimonios-container {
@@ -362,6 +438,8 @@ nav {
     justify-content: center;
     align-items: center;
     perspective: 1000px;
+    box-shadow: none !important;
+    background: none !important;
 }
 /*contenido */
 .contenido{
@@ -382,12 +460,14 @@ nav {
     height: auto;
     cursor: pointer;
     transition: transform 0.3s ease;
-    filter: drop-shadow(0 8px 25px rgba(0,0,0,0.15));
+    box-shadow: none !important;
+    filter: none !important;
+    background: none !important;
 }
 
 .sobre-cerrado {
     cursor: pointer;
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 /* Eliminado hover para solapa y carta - ahora se maneja con click */
@@ -842,11 +922,11 @@ nav {
         font-size: 2.5rem;
     }
     
-    .testimonios-section h2,
     #recursos h2,
     #contacto h2,
     #chat h2 {
         font-size: 2.5rem;
+        letter-spacing: 1px;
     }
     
     .contenido {
@@ -1177,6 +1257,242 @@ nav {
     animation: pulse-subtle 2s infinite;
     pointer-events: none;
     z-index: -1;
+}
+
+/* ========================================
+   CONFIGURACIÓN BÁSICA PARA SOBRES (SIN HOVER)
+   ======================================== */
+
+/* Configuración básica del sobre - SIN efectos hover */
+.sobre-cerrado {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Configuración básica del contenedor */
+.testimonio-carta-wrapper {
+    padding: 20px;
+    position: relative;
+    display: inline-block;
+}
+
+/* Estado activo para animaciones de click */
+.sobre-cerrado.activo {
+    transform: none !important;
+    filter: none !important;
+}
+
+.sobre-cerrado.activo * {
+    filter: none !important;
+}
+
+/* === SELECTOR DE COLORES PASTELES PARA SOBRES === */
+.sobre-color-selector {
+    margin-top: 10px;
+}
+
+.colores-pasteles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 200px;
+    margin-bottom: 15px;
+}
+
+.color-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected {
+    border-color: #A48CA4;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(164, 140, 164, 0.4);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #A48CA4;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+}
+
+.color-selected-text {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 8px;
+}
+
+/* Efecto de ripple al hacer click en colores */
+.color-option::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(164, 140, 164, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.color-option:active::before {
+    width: 100px;
+    height: 100px;
+}
+
+/* Responsive para selector de colores */
+@media (max-width: 768px) {
+    .colores-pasteles {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 240px;
+    }
+    
+    .color-option {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* === ESTILOS PARA BOTÓN CREAR TESTIMONIO === */
+#btn-crear-testimonio {
+    background: linear-gradient(135deg, #4A148C, #1A237E);
+    color: white;
+    border: none;
+    padding: 18px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(74, 20, 140, 0.3);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    min-width: 200px;
+    z-index: 1;
+}
+
+#btn-crear-testimonio::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #6A1B9A, #3F51B5);
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+#btn-crear-testimonio:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(74, 20, 140, 0.4), 
+                0 0 20px rgba(106, 27, 154, 0.3);
+    color: #fff;
+}
+
+#btn-crear-testimonio:hover::before {
+    left: 0;
+}
+
+#btn-crear-testimonio:active {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 5px 15px rgba(74, 20, 140, 0.5);
+}
+
+/* Efecto de brillo adicional */
+#btn-crear-testimonio::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#btn-crear-testimonio:hover::after {
+    animation: shine 0.8s ease-in-out;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    #btn-crear-testimonio {
+        padding: 15px 30px;
+        font-size: 1rem;
+        min-width: 180px;
+    }
+}
+
+/* === ESTILOS PARA ESTADÍSTICAS === */
+/* Estilos para gráficas responsivas */
+#estadisticas canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    #estadisticas {
+        padding: 40px 10px !important;
+    }
+    
+    #estadisticas h2 {
+        font-size: 2rem !important;
+    }
+    
+    #estadisticas > div > div:first-child > div {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    }
+    
+    #estadisticas > div > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+    }
+    
+    #estadisticas canvas {
+        width: 200px !important;
+        height: 200px !important;
+    }
 }
 
 

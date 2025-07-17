@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Empathy - Autenticación</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='auth-styles.css'>
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <!-- 📊 Sistema de estadísticas en tiempo real -->
+    <script src="real-time-stats.js"></script>
+    <script defer src='auth-system.js'></script>
+    <script>
+        // Inicializar el gestor de estadísticas cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Usar la función de inicialización global si está disponible
+            if (window.initializeStatisticsSystem) {
+                window.initializeStatisticsSystem();
+                console.log('📊 Sistema de estadísticas inicializado en página de autenticación');
+            } else {
+                // Fallback por si acaso
+                window.statsManager = new StatisticsManager();
+                console.log('📊 Sistema de estadísticas inicializado manualmente en página de autenticación');
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="container" class="container">
+        <div class="form-container sign-up">
+            <form id="register-form-element">
+                <h1>Crear Cuenta</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class='bx bxl-facebook'></i></a>
+                    <a href="#" class="icon"><i class='bx bxl-google'></i></a>
+                    <a href="#" class="icon"><i class='bx bxl-linkedin'></i></a>
+                    <a href="#" class="icon"><i class='bx bxl-github'></i></a>
+                </div>
+                <span>usa tu correo electrónico para registrarte</span>
+                <input type="text" id="register-name" name="name" placeholder="Nombre completo" required>
+                <small class="error-message"></small>
+                <input type="email" id="register-email" name="email" placeholder="Correo Electrónico" required>
+                <small id="register-email-error" class="error-message"></small>
+                <input type="password" id="register-password" name="password" placeholder="Contraseña" required minlength="6">
+                <small class="error-message"></small>
+                <input type="password" id="register-confirm-password" name="confirmPassword" placeholder="Confirmar Contraseña" required minlength="6">
+                <small class="error-message"></small>
+                <input type="number" id="register-age" placeholder="Edad" required min="0">
+                <small class="error-message"></small>
+                <select id="register-gender" required>
+                    <option value="">Selecciona tu Género</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <small class="error-message"></small>
+                <div class="terms-container">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="accept-terms" required>
+                        <span class="checkmark"></span>
+                        Acepto los términos y condiciones
+                    </label>
+                </div>
+                <button type="submit" id="register-btn">Registrarse</button>
+            </form>
+        </div>
+
+        <div class="form-container sign-in">
+            <form id="login-form-element">
+                <h1>Iniciar Sesión</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class='bx bxl-facebook'></i></a>
+                    <a href="#" class="icon"><i class='bx bxl-google'></i></a>
+                    <a href="#" class="icon"><i class='bx bxl-linkedin'></i></a>
+                    <a href="#" class="icon"><i class='bx bxl-github'></i></a>
+                </div>
+                <span>o usa tu correo y contraseña</span>
+                <input type="email" id="login-email" name="email" placeholder="Correo Electrónico" required>
+                <small id="login-email-error" class="error-message"></small>
+                <input type="password" id="login-password" name="password" placeholder="Contraseña" required>
+                <small class="error-message"></small>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        Recordarme
+                    </label>
+                    <a href="#" class="fp">¿Olvidaste tu contraseña?</a>
+                </div>
+                <button type="submit" id="login-btn">Iniciar Sesión</button>
+            </form>
+        </div>
+
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>¡Bienvenido de vuelta!</h1>
+                    <p>Inicia sesión con tus datos personales para acceder a tu espacio seguro en Empathy</p>
+                    <button class="hidden" id="login">Iniciar Sesión</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>¡Únete a Empathy!</h1>
+                    <p>Regístrate y forma parte de nuestra comunidad de apoyo emocional y crecimiento personal</p>
+                    <button class="hidden" id="register">Registrarse</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes de error/éxito -->
+        <div class="message" id="login-message"></div>
+        <div class="message" id="register-message"></div>
+    </div>
+</body>
+</html>

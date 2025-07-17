@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Completo - Empathy</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            max-width: 500px;
+        }
+        button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            background: #ee5a24;
+            transform: translateY(-2px);
+        }
+        .success {
+            background: #2ecc71;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Reset Completo del Sistema</h1>
+        <p>Este botón limpiará COMPLETAMENTE todos los datos de autenticación y te llevará al login.</p>
+        
+        <button onclick="resetCompleto()">🗑️ RESET TOTAL Y IR AL LOGIN</button>
+        
+        <div id="success" class="success">
+            ✅ Sistema limpiado completamente. Redirigiendo al login...
+        </div>
+        
+        <div id="info" style="margin-top: 20px; font-size: 14px; text-align: left;">
+            <strong>Estado actual del sistema:</strong><br>
+            <span id="sessionStatus"></span><br>
+            <span id="usersStatus"></span><br>
+            <span id="profileStatus"></span>
+        </div>
+    </div>
+
+    <script>
+        function resetCompleto() {
+            console.log('🔄 INICIANDO RESET COMPLETO...');
+            
+            // Limpiar TODO localStorage
+            localStorage.clear();
+            
+            // Limpiar TODO sessionStorage
+            sessionStorage.clear();
+            
+            // Limpiar cookies si las hay
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            console.log('✅ TODO limpiado completamente');
+            
+            // Mostrar mensaje de éxito
+            document.getElementById('success').style.display = 'block';
+            
+            // Redirigir después de 2 segundos
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+
+        function checkStatus() {
+            const session = localStorage.getItem('empathy_session');
+            const users = localStorage.getItem('empathy_users');
+            const profile = localStorage.getItem('userProfilePic');
+            
+            document.getElementById('sessionStatus').textContent = 
+                'Sesión: ' + (session ? '❌ EXISTE' : '✅ LIMPIA');
+            document.getElementById('usersStatus').textContent = 
+                'Usuarios: ' + (users ? '❌ EXISTE' : '✅ LIMPIO');
+            document.getElementById('profileStatus').textContent = 
+                'Perfil: ' + (profile ? '❌ EXISTE' : '✅ LIMPIO');
+        }
+
+        // Verificar estado al cargar
+        window.onload = checkStatus;
+    </script>
+</body>
+</html>

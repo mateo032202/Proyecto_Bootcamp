@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Color de Sobre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .color-test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .color-test h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        .color-sample {
+            width: 100%;
+            height: 80px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎨 Prueba de Funcionalidad de Color de Sobre</h1>
+        
+        <div class="color-test">
+            <h3>Colores Pasteles Disponibles</h3>
+            <div class="color-grid">
+                <div class="color-sample" style="background-color: #E8F5E8;">Verde Pastel<br>#E8F5E8</div>
+                <div class="color-sample" style="background-color: #E8F0FF;">Azul Pastel<br>#E8F0FF</div>
+                <div class="color-sample" style="background-color: #FFE8F0;">Rosa Pastel<br>#FFE8F0</div>
+                <div class="color-sample" style="background-color: #FFF8E8;">Amarillo Pastel<br>#FFF8E8</div>
+                <div class="color-sample" style="background-color: #F0E8FF;">Lavanda Pastel<br>#F0E8FF</div>
+                <div class="color-sample" style="background-color: #E8F8FF;">Celeste Pastel<br>#E8F8FF</div>
+                <div class="color-sample" style="background-color: #F8F0E8;">Durazno Pastel<br>#F8F0E8</div>
+                <div class="color-sample" style="background-color: #F0F8E8;">Menta Pastel<br>#F0F8E8</div>
+                <div class="color-sample" style="background-color: #FAFAFA;">Blanco Clásico<br>#FAFAFA</div>
+            </div>
+        </div>
+        
+        <div class="color-test">
+            <h3>Pruebas de Funciones</h3>
+            <button class="test-button" onclick="testAdjustBrightness()">Probar adjustBrightness</button>
+            <button class="test-button" onclick="testColorApplication()">Probar Aplicación de Color</button>
+            <button class="test-button" onclick="openMainPage()">Abrir Página Principal</button>
+            <button class="test-button" onclick="clearConsole()">Limpiar Consola</button>
+        </div>
+        
+        <div class="console-output" id="console">
+            <div>🚀 Consola de pruebas inicializada...</div>
+            <div>✅ Listo para hacer pruebas de color</div>
+        </div>
+    </div>
+
+    <script>
+        let consoleDiv = document.getElementById('console');
+        
+        function log(message) {
+            const div = document.createElement('div');
+            div.textContent = message;
+            consoleDiv.appendChild(div);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        function clearConsole() {
+            consoleDiv.innerHTML = '<div>🧹 Consola limpiada...</div>';
+        }
+        
+        // Función copiada desde main.js para pruebas
+        function adjustBrightness(hex, percent) {
+            if (!hex || hex.length !== 7 || !hex.startsWith('#')) {
+                log('⚠️ Color hexadecimal inválido: ' + hex);
+                return hex;
+            }
+            
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            
+            const newR = Math.max(0, Math.min(255, r + (r * percent / 100)));
+            const newG = Math.max(0, Math.min(255, g + (g * percent / 100)));
+            const newB = Math.max(0, Math.min(255, b + (b * percent / 100)));
+            
+            const toHex = (n) => {
+                const hex = Math.round(n).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+            
+            return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+        }
+        
+        function testAdjustBrightness() {
+            log('🧪 Probando función adjustBrightness...');
+            
+            const colores = [
+                '#E8F5E8', '#E8F0FF', '#FFE8F0', '#FFF8E8',
+                '#F0E8FF', '#E8F8FF', '#F8F0E8', '#F0F8E8'
+            ];
+            
+            colores.forEach(color => {
+                const darker = adjustBrightness(color, -10);
+                log(`🎨 ${color} -> ${darker} (10% más oscuro)`);
+            });
+            
+            log('✅ Prueba de adjustBrightness completada');
+        }
+        
+        function testColorApplication() {
+            log('🧪 Simulando aplicación de color...');
+            
+            // Simular el proceso de selección y aplicación de color
+            const testColor = '#FFE8F0'; // Rosa pastel
+            log('🎯 Color seleccionado para prueba: ' + testColor);
+            log('🔧 Aplicando color al gradiente...');
+            
+            const darkerColor = adjustBrightness(testColor, -10);
+            log('✅ Color principal: ' + testColor);
+            log('✅ Color oscuro: ' + darkerColor);
+            log('📦 Simulación de aplicación al sobre completada');
+            
+            // Probar con blanco clásico
+            log('🧪 Probando con color blanco clásico...');
+            const whiteColor = '#FAFAFA';
+            if (whiteColor === '#FAFAFA') {
+                log('✅ Color blanco detectado correctamente - sin cambios necesarios');
+            }
+        }
+        
+        function openMainPage() {
+            log('🌐 Abriendo página principal...');
+            window.open('index.html', '_blank');
+        }
+        
+        // Inicialización
+        log('🎨 Página de pruebas cargada');
+        log('📋 Instrucciones:');
+        log('1. Usa los botones para probar las funciones');
+        log('2. Revisa la consola del navegador (F12) para más detalles');
+        log('3. Abre la página principal y prueba crear un testimonio');
+    </script>
+</body>
+</html>

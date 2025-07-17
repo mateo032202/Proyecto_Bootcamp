@@ -1,867 +1,260 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Empathy</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="styles_new.css" />
-    <link rel="stylesheet" href="styles_carta.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-    <script src="main.js" defer></script>
-    <script src="carta-gsap-fixed.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empathy - Bienvenido</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .redirect-container {
+            text-align: center;
+            color: white;
+            z-index: 10;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: pulse 2s infinite;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            top: 70%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+    </style>
 </head>
-
 <body>
-
-    <header>
-
-        <nav>
-            <div class="nav-logo empathy-logo">
-                <!-- <img src="images/logo.png" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"> -->
-                <span class="site-title">
-                    <span class="empathy-letter empathy-e">E</span>
-                    <span class="empathy-letter empathy-m">m</span>
-                    <span class="empathy-letter empathy-p">p</span>
-                    <span class="empathy-letter empathy-a">a</span>
-                    <span class="empathy-letter empathy-t">t</span>
-                    <span class="empathy-letter empathy-h">h</span>
-                    <span class="empathy-letter empathy-y">y</span>
-                </span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#inicio" class="nav-button">Inicio</a></li>
-                <li><a href="#testimonios" class="nav-button">Testimonios</a></li>
-                <li><a href="#recursos" class="nav-button">Recursos</a></li>
-                <li><a href="#contacto" class="nav-button">Contacto</a></li>
-                <li><a href="#nosotros" class="nav-button">Nosotros</a></li>
-                <li><a href="#chat" class="nav-button chat-button"><span>Chat en Vivo</span></a></li>
-            </ul>
-        </nav>
-    </header>
-    <section id="inicio" style="display:block;">
-        <div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f6e5f5, #e8f0ff); text-align: center; padding: 40px 20px;">
-            <div>
-                <h1 style="font-size: 3.5rem; color: #5d4e6d; margin-bottom: 30px; font-family: 'Super Adorable', cursive;">
-                    Bienvenido a Empathy
-                </h1>
-                <p style="font-size: 1.3rem; color: #666; margin-bottom: 40px; max-width: 600px; line-height: 1.6;">
-                    Un espacio seguro donde puedes encontrar apoyo, comprensión y herramientas para tu bienestar emocional.
-                </p>
-                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-                    <a href="#testimonios" style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;">
-                        Ver Testimonios
-                    </a>
-                    <a href="#nosotros" style="background: linear-gradient(135deg, #B71C1C, #E65100); color: white; padding: 15px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;">
-                        Conoce al Equipo
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section id="testimonios" class="testimonios-section" style="display:none;">
-        <h2>Testimonios</h2>
-        <div class="testimonios-container">
-            <!-- Testimonio 1 -->
-            <div class="testimonio-carta-wrapper">
-                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Definiciones para sombras y gradientes -->
-                    <defs>
-                        <filter id="sombraSobre1" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                            <feOffset dx="2" dy="5" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.2"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraHoja1" x="-10%" y="-10%" width="120%" height="120%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
-                            <feOffset dx="0" dy="1" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.15"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraSello1" x="-30%" y="-30%" width="160%" height="160%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                            <feOffset dx="1" dy="3" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.4"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <radialGradient id="gradienteSello1" cx="0.3" cy="0.3" r="0.8">
-                            <stop offset="0%" style="stop-color:#A52A2A;stop-opacity:1" />
-                            <stop offset="60%" style="stop-color:#8B0000;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#5D0000;stop-opacity:1" />
-                        </radialGradient>
-                        <linearGradient id="gradienteCuerpo1" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="gradienteTapa1" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    
-                    <!-- Cuerpo principal del sobre -->
-                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpo1)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobre1)"/>
-                    
-                    <!-- Forma en X (parte trasera del sobre cerrado) -->
-                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
-                    
-                    <!-- Hoja/carta que se desliza hacia arriba en hover - OCULTA INICIALMENTE -->
-                    <g class="carta-contenido" transform="translate(0,0)">
-                        <!-- Papel de la carta -->
-                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHoja1)" opacity="0.95"/>
-                        
-                        <!-- Contenido del testimonio -->
-                        <foreignObject x="100" y="140" width="200" height="100">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
-                                "Empathy me ayudó a superar momentos muy difíciles. El apoyo y la comprensión que encontré aquí transformaron mi vida completamente."
-                            </div>
-                        </foreignObject>
-                    </g>
-                    
-                    <!-- Bordes tricolores del sobre aéreo -->
-                    <!-- Borde izquierdo -->
-                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <!-- Borde derecho -->
-                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <!-- Borde inferior -->
-                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
-                    
-                    <!-- Solapa del sobre que se abre en hover -->
-                    <g class="solapa-sobre" transform-origin="200 120">
-                        <!-- Tapa cerrada del sobre -->
-                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa1)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre1)"/>
-                        
-                        <!-- Línea de sellado -->
-                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
-                        
-                        <!-- Sombra interior de sellado -->
-                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
-                        
-                        <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
-                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello1)" opacity="0.95"/>
-                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
-                    </g>
-                    
-                    <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
-                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(3 110 240)">
-                        María González
-                    </text>
-                </svg>
-            </div>
-            
-            <!-- Testimonio 2 -->
-            <div class="testimonio-carta-wrapper">
-                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="sombraSobre2" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                            <feOffset dx="2" dy="5" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.2"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraHoja2" x="-10%" y="-10%" width="120%" height="120%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
-                            <feOffset dx="0" dy="1" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.15"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraSello2" x="-30%" y="-30%" width="160%" height="160%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                            <feOffset dx="1" dy="3" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.4"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <radialGradient id="gradienteSello2" cx="0.3" cy="0.3" r="0.8">
-                            <stop offset="0%" style="stop-color:#A52A2A;stop-opacity:1" />
-                            <stop offset="60%" style="stop-color:#8B0000;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#5D0000;stop-opacity:1" />
-                        </radialGradient>
-                        <linearGradient id="gradienteCuerpo2" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="gradienteTapa2" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    
-                    <!-- Cuerpo principal del sobre -->
-                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpo2)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobre2)"/>
-                    
-                    <!-- Forma en X (parte trasera del sobre cerrado) -->
-                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
-                    
-                    <!-- Hoja/carta que se desliza hacia arriba en hover - OCULTA INICIALMENTE -->
-                    <g class="carta-contenido" transform="translate(0,0)">
-                        <!-- Papel de la carta -->
-                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHoja2)" opacity="0.95"/>
-                        
-                        <!-- Contenido del testimonio -->
-                        <foreignObject x="100" y="140" width="200" height="100">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
-                                "Gracias a Empathy, aprendí a valorarme y a encontrar esperanza cuando todo parecía perdido. Su equipo es excepcional."
-                            </div>
-                        </foreignObject>
-                    </g>
-                    
-                    <!-- Bordes tricolores iguales -->
-                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <!-- Borde inferior -->
-                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
-                    
-                    <!-- Solapa del sobre que se abre en hover -->
-                    <g class="solapa-sobre" transform-origin="200 120">
-                        <!-- Tapa cerrada del sobre -->
-                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa2)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre2)"/>
-                        
-                        <!-- Línea de sellado -->
-                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
-                        
-                        <!-- Sombra interior de sellado -->
-                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
-                        
-                        <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
-                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello2)" opacity="0.95"/>
-                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
-                    </g>
-                    
-                    <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
-                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(-3 110 240)">
-                        Carlos Rodríguez
-                    </text>
-                </svg>
-            </div>
-            
-            <!-- Testimonio 3 -->
-            <div class="testimonio-carta-wrapper">
-                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="sombraSobre3" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                            <feOffset dx="2" dy="5" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.2"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraHoja3" x="-10%" y="-10%" width="120%" height="120%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
-                            <feOffset dx="0" dy="1" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.15"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraSello3" x="-30%" y="-30%" width="160%" height="160%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                            <feOffset dx="1" dy="3" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.4"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <radialGradient id="gradienteSello3" cx="0.3" cy="0.3" r="0.8">
-                            <stop offset="0%" style="stop-color:#A52A2A;stop-opacity:1" />
-                            <stop offset="60%" style="stop-color:#8B0000;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#5D0000;stop-opacity:1" />
-                        </radialGradient>
-                        <linearGradient id="gradienteCuerpo3" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="gradienteTapa3" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    
-                    <!-- Cuerpo principal del sobre -->
-                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpo3)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobre3)"/>
-                    
-                    <!-- Forma en X (parte trasera del sobre cerrado) -->
-                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
-                    
-                    <!-- Hoja/carta que se desliza hacia arriba en hover - OCULTA INICIALMENTE -->
-                    <g class="carta-contenido" transform="translate(0,0)">
-                        <!-- Papel de la carta -->
-                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHoja3)" opacity="0.95"/>
-                        
-                        <!-- Contenido del testimonio -->
-                        <foreignObject x="100" y="140" width="200" height="100">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
-                                "El acompañamiento de Empathy fue fundamental en mi proceso de sanación. Encontré un espacio seguro para crecer."
-                            </div>
-                        </foreignObject>
-                    </g>
-                    
-                    <!-- Bordes tricolores iguales -->
-                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <!-- Borde inferior -->
-                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
-                    
-                    <!-- Solapa del sobre que se abre en hover -->
-                    <g class="solapa-sobre" transform-origin="200 120">
-                        <!-- Tapa cerrada del sobre -->
-                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa3)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre3)"/>
-                        
-                        <!-- Línea de sellado -->
-                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
-                        
-                        <!-- Sombra interior de sellado -->
-                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
-                        
-                        <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
-                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello3)" opacity="0.95"/>
-                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
-                    </g>
-                    
-                    <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
-                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(-3 110 240)">
-                        Ana Martínez
-                    </text>
-                </svg>
-            </div>
-        </div>
-        
-        <!-- Formulario para crear nuevo testimonio -->
-        <div class="crear-testimonio-form">
-            <h3>Comparte tu experiencia</h3>
-            <form id="testimonio-form">
-                <div class="form-group">
-                    <label for="testimonio-nombre">Tu nombre (aparecerá como firma):</label>
-                    <input type="text" id="testimonio-nombre" placeholder="Ej: María García" maxlength="30" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="testimonio-color">Color de tu firma:</label>
-                    <div class="color-picker-container">
-                        <input type="color" id="testimonio-color" value="#1A237E">
-                        <span class="color-preview">Vista previa del color</span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="testimonio-texto">Tu testimonio:</label>
-                    <textarea id="testimonio-texto" placeholder="Comparte tu experiencia con Empathy..." rows="4" maxlength="250" required></textarea>
-                    <small class="char-counter">0/250 caracteres</small>
-                </div>
-                
-                <button type="submit" class="btn-crear-testimonio">Crear Testimonio</button>
-            </form>
-        </div>
-        
-        <!-- Plantilla invisible para clonar sobres -->
-        <div id="sobre-template" style="display: none;">
-            <div class="testimonio-carta-wrapper">
-                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="sombraSobreTemplate" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                            <feOffset dx="2" dy="5" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.2"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraHojaTemplate" x="-10%" y="-10%" width="120%" height="120%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
-                            <feOffset dx="0" dy="1" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.15"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <filter id="sombraSelloTemplate" x="-30%" y="-30%" width="160%" height="160%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                            <feOffset dx="1" dy="3" result="offset"/>
-                            <feFlood flood-color="#000" flood-opacity="0.4"/>
-                            <feComposite in2="offset" operator="in"/>
-                            <feMerge>
-                                <feMergeNode/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <linearGradient id="gradienteCuerpoTemplate" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="gradienteTapaTemplate" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    
-                    <!-- Cuerpo principal del sobre -->
-                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpoTemplate)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobreTemplate)"/>
-                    
-                    <!-- Forma en X (parte trasera del sobre cerrado) -->
-                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
-                    
-                    <!-- Hoja/carta que se desliza hacia arriba en hover -->
-                    <g class="carta-contenido" transform="translate(0,0)">
-                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHojaTemplate)" opacity="0.95"/>
-                        <foreignObject x="100" y="140" width="200" height="100">
-                            <div xmlns="http://www.w3.org/1999/xhtml" class="testimonio-contenido" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
-                                <!-- Contenido del testimonio se insertará aquí -->
-                            </div>
-                        </foreignObject>
-                    </g>
-                    
-                    <!-- Bordes tricolores -->
-                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
-                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
-                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
-                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
-                    
-                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
-                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
-                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
-                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
-                    
-                    <!-- Solapa del sobre que se abre en hover -->
-                    <g class="solapa-sobre" transform-origin="200 120">
-                        <polygon points="80,120 200,40 320,120" fill="url(#gradienteTapaTemplate)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobreTemplate)"/>
-                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
-                        <polygon points="80,120 200,40 320,120 300,110 200,55 100,110" fill="#d0d0d0" opacity="0.6"/>
-                        
-                        <!-- Sello redondo con logo -->
-                        <circle cx="200" cy="190" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSelloTemplate)" opacity="0.95"/>
-                        <circle cx="200" cy="190" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
-                        <image x="182" y="172" width="36" height="36" href="images/logo.png" opacity="0.9"/>
-                    </g>
-                    
-                    <!-- Firma manuscrita -->
-                    <text class="firma-manuscrita" x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(-3 110 240)">
-                        <!-- Nombre se insertará aquí -->
-                    </text>
-                </svg>
-            </div>
-    </section>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
     
-    <!-- SECCIÓN NOSOTROS - CONTENIDO ORIGINAL CON ESTILOS FORZADOS -->
-    <section id="nosotros" style="display:none; background: linear-gradient(135deg, #f6e5f5, #e8f0ff); padding: 80px 20px; min-height: 100vh;">
-        <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 3rem; color: #5d4e6d; text-align: center; margin-bottom: 40px; text-shadow: 0 2px 8px rgba(0,0,0,0.10);">Nosotros</h2>
-        
-        <div class="contenido" style="max-width: 1200px; margin: 0 auto 60px auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-            <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 25px; text-align: justify;">Somos un equipo comprometido con el bienestar emocional y social, dedicados a crear espacios de apoyo
-                y empatía para quienes atraviesan momentos difíciles. Nuestra misión es inspirar esperanza y
-                acompañar a las personas en su camino hacia una vida mejor.</p>
-            <br>
-            <ol style="font-size: 1.1rem; color: #555; padding-left: 20px;">
-                <li style="margin: 10px 0;">Escucha activa y acompañamiento</li>
-                <li style="margin: 10px 0;">Recursos y herramientas para el bienestar</li>
-                <li style="margin: 10px 0;">Comunidad de apoyo</li>
-            </ol>
+    <div class="redirect-container">
+        <img src="images/logo.png" alt="Empathy Logo" class="logo">
+        <h1 class="title">Empathy</h1>
+        <p class="subtitle">Un espacio seguro para compartir y crecer</p>
+        <div class="loading">
+            <div class="spinner"></div>
+            <span>Cargando...</span>
         </div>
-        
-        <div class="contenido" style="max-width: 1200px; margin: 0 auto 60px auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0;">Nuestra Misión</h2>
-            <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 25px; text-align: center;">Empoderar a las personas a través de la empatía y el apoyo emocional.</p>
+    </div>
+
+    <script>
+        // ===== CONFIGURACIÓN =====
+        const AUTH_CONFIG = {
+            SESSION_KEY: 'empathy_session',
+            USERS_KEY: 'empathy_users'
+        };
+
+        // ===== VERIFICACIÓN DE SESIÓN =====
+        function checkSession() {
+            const sessionData = localStorage.getItem(AUTH_CONFIG.SESSION_KEY);
             
-            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0;">Nuestra Visión</h2>
-            <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 25px; text-align: center;">Crear un mundo donde todos se sientan escuchados y comprendidos.</p>
+            if (!sessionData) {
+                return null;
+            }
+
+            try {
+                const session = JSON.parse(sessionData);
+                const now = new Date();
+                const expiresAt = new Date(session.expiresAt);
+
+                if (now > expiresAt) {
+                    localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
+                    return null;
+                }
+
+                // Verificar que el usuario aún existe
+                const users = JSON.parse(localStorage.getItem(AUTH_CONFIG.USERS_KEY) || '[]');
+                const user = users.find(u => u.id === session.userId && u.isActive);
+                
+                if (!user) {
+                    localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
+                    return null;
+                }
+
+                return session;
+            } catch (error) {
+                localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
+                return null;
+            }
+        }
+
+        // ===== REDIRECCIÓN AUTOMÁTICA =====
+        function redirect() {
+            // SIEMPRE verificar parámetro logout primero
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('logout') === 'true') {
+                console.log('🔒 Logout detectado - FORZANDO redirección al login...');
+                window.location.href = 'auth.html';
+                return;
+            }
             
-            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0;">Nuestros Valores</h2>
-            <ul style="list-style: none; padding: 0; max-width: 600px; margin: 0 auto;">
-                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
-                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
-                    Empatía
-                </li>
-                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
-                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
-                    Respeto
-                </li>
-                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
-                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
-                    Solidaridad
-                </li>
-                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
-                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
-                    Inclusión
-                </li>
-            </ul>
-        </div>
-        
-        <!-- Sección de Desarrolladores con diseño original y estilos forzados -->
-        <div class="desarrolladores-section" style="max-width: 1200px; margin: 0 auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0; letter-spacing: 1px;">Nuestros Desarrolladores</h2>
-            <div class="card-container">
-                
-                <!-- TARJETA MATEO -->
-                <div class="dev-card-wrapper">
-                    <div class="dev-card">
-                        <!-- FRENTE DE LA TARJETA -->
-                        <div class="card-front">
-                            <div class="card-image">
-                                <img src="images/avatar1.jpg" alt="Mateo">
-                            </div>
-                            <div class="card-name">
-                                <h3>Mateo</h3>
-                            </div>
-                        </div>
-                        <!-- REVERSO DE LA TARJETA -->
-                        <div class="card-back">
-                            <div class="card-info">
-                                <h3>Mateo Suarez</h3>
-                                <p class="role">Frontend Developer</p>
-                                <p class="description">Apasionado del diseño web y la experiencia de usuario. Especializado en crear interfaces intuitivas y visualmente atractivas.</p>
-                                <div class="skills">
-                                    <span>HTML/CSS</span>
-                                    <span>JavaScript</span>
-                                    <span>React</span>
-                                    <span>UI/UX</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- TARJETA JHONATAN -->
-                <div class="dev-card-wrapper">
-                    <div class="dev-card">
-                        <!-- FRENTE DE LA TARJETA -->
-                        <div class="card-front">
-                            <div class="card-image">
-                                <img src="images/avatar2.jpg" alt="Jhonatan">
-                            </div>
-                            <div class="card-name">
-                                <h3>Jhonatan</h3>
-                            </div>
-                        </div>
-                        <!-- REVERSO DE LA TARJETA -->
-                        <div class="card-back">
-                            <div class="card-info">
-                                <h3>Jhonatan Martinez</h3>
-                                <p class="role">Backend Developer</p>
-                                <p class="description">Especialista en bases de datos y backend. Enfocado en crear sistemas robustos y escalables para aplicaciones web.</p>
-                                <div class="skills">
-                                    <span>Python</span>
-                                    <span>Django</span>
-                                    <span>PostgreSQL</span>
-                                    <span>APIs</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- TARJETA KAREN -->
-                <div class="dev-card-wrapper">
-                    <div class="dev-card">
-                        <!-- FRENTE DE LA TARJETA -->
-                        <div class="card-front">
-                            <div class="card-image">
-                                <img src="images/avatar3.jpg" alt="Karen">
-                            </div>
-                            <div class="card-name">
-                                <h3>Karen</h3>
-                            </div>
-                        </div>
-                        <!-- REVERSO DE LA TARJETA -->
-                        <div class="card-back">
-                            <div class="card-info">
-                                <h3>Karen López</h3>
-                                <p class="role">Full Stack Developer</p>
-                                <p class="description">Creativa y enfocada en resolver problemas. Combina diseño y desarrollo para crear soluciones completas e innovadoras.</p>
-                                <div class="skills">
-                                    <span>JavaScript</span>
-                                    <span>Node.js</span>
-                                    <span>MongoDB</span>
-                                    <span>Design</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+            const session = checkSession();
+            
+            console.log('🔍 Estado de sesión:', session ? 'ACTIVA' : 'INACTIVA');
+            
+            if (session) {
+                console.log('✅ Sesión activa encontrada, redirigiendo a la aplicación...');
+                console.log('👤 Usuario:', session.userId);
+                window.location.href = 'app.html';
+            } else {
+                console.log('❌ No hay sesión activa, redirigiendo al login...');
+                console.log('🔐 Mostrando pantalla de autenticación...');
+                window.location.href = 'auth.html';
+            }
+        }
 
-    <!-- Sección de Recursos -->
-    <section id="recursos" style="display:none;">
-        <div>
-            <h2>Recursos de Bienestar</h2>
-            <div style="max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                <h3 style="color: #5d4e6d; margin-bottom: 30px; text-align: center;">Herramientas para tu Bienestar</h3>
-                <div class="grid-recursos">
-                    <div class="recurso-card">
-                        <h4>🧘‍♀️ Meditación</h4>
-                        <p style="color: #555;">Técnicas de relajación y mindfulness para reducir el estrés y la ansiedad.</p>
-                    </div>
-                    <div class="recurso-card">
-                        <h4>📚 Recursos Educativos</h4>
-                        <p style="color: #555;">Artículos y guías sobre salud mental y bienestar emocional.</p>
-                    </div>
-                    <div class="recurso-card">
-                        <h4>🤝 Apoyo Comunitario</h4>
-                        <p style="color: #555;">Conecta con personas que comparten experiencias similares.</p>
-                    </div>
-                </div>
-                <div style="text-align: center; margin-top: 30px;">
-                    <button class="btn-empathy">Explorar Recursos</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección de Contacto -->
-    <section id="contacto" style="display:none;">
-        <div>
-            <h2>Contáctanos</h2>
-            <div>
-                <div class="contact-section">
-                    <h3 style="text-align: center; color: #5d4e6d; margin-bottom: 30px;">¿Necesitas ayuda? Estamos aquí para apoyarte</h3>
-                    <form class="contact-form">
-                        <div class="form-container">
-                            <div>
-                                <label for="nombre">Nombre:</label>
-                                <input type="text" id="nombre" name="nombre" required>
-
-                                <label for="email">Email:</label>
-                                <input type="email" id="email" name="email" required>
-
-                                <label for="asunto">Asunto:</label>
-                                <input type="text" id="asunto" name="asunto" required>
-
-                                <label for="mensaje">Mensaje:</label>
-                                <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos cómo podemos ayudarte..." required></textarea>
-
-                                <button type="submit">Enviar Mensaje</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección de Chat -->
-    <section id="chat" style="display:none;">
-        <div>
-            <h2>Chat en Vivo</h2>
-            <div style="max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                <div class="chat-info">
-                    <h3 style="margin-bottom: 15px;">💬 Apoyo Inmediato</h3>
-                    <p style="margin-bottom: 20px;">Nuestro equipo de profesionales está disponible para brindarte apoyo emocional cuando lo necesites.</p>
-                    <div class="horario-info">
-                        <p><strong>Horario de atención:</strong></p>
-                        <p>Lunes a Viernes: 9:00 AM - 8:00 PM</p>
-                        <p>Sábados: 10:00 AM - 6:00 PM</p>
-                    </div>
-                </div>
-                <div style="text-align: center;">
-                    <button class="btn-empathy">Iniciar Chat</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Empathy - Verificando autenticación...');
+            console.log('📍 Punto de entrada: index.html');
+            
+            // Verificar si se debe forzar logout
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('logout') === 'true') {
+                console.log('🧹 Forzando limpieza de sesión...');
+                localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
+                localStorage.removeItem(AUTH_CONFIG.USERS_KEY);
+                localStorage.removeItem('userProfilePic');
+                sessionStorage.clear();
+                // Remover parámetro de URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Verificar estado de localStorage
+            const sessionData = localStorage.getItem(AUTH_CONFIG.SESSION_KEY);
+            const usersData = localStorage.getItem(AUTH_CONFIG.USERS_KEY);
+            
+            console.log('📊 Datos de sesión:', sessionData ? 'ENCONTRADOS' : 'NO HAY');
+            console.log('📊 Datos de usuarios:', usersData ? 'ENCONTRADOS' : 'NO HAY');
+            
+            // Limpiar cualquier sesión corrupta
+            try {
+                if (sessionData) {
+                    JSON.parse(sessionData); // Probar si es JSON válido
+                    console.log('✅ Datos de sesión válidos');
+                }
+            } catch (error) {
+                console.log('🧹 Limpiando sesión corrupta...');
+                localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
+            }
+            
+            // Simular carga por 2 segundos para mostrar la animación
+            setTimeout(redirect, 2000);
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,2799 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Empathy</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles_new.css" />
+    <link rel="stylesheet" href="styles_carta.css" />
+    <!-- 📊 Sistema de estadísticas FUNCIONAL -->
+    <script src="stats-working.js"></script>
+    <!-- 📊 Sistema de estadísticas en tiempo real -->
+    <script src="real-time-stats.js"></script>
+    <!-- 🧪 Script de prueba para usuarios -->
+    <script src="test-users.js"></script>
+    <!-- 📄 Librería para generar PDFs - VERSION ESTABLE -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+
+          footer {
+      background-color: #222;
+      color: #fff;
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    footer a {
+      color: #66ccff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+        /* Ocultar contenido hasta verificar autenticación */
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        body.authenticated {
+            opacity: 1;
+        }
+        /* Loading screen mientras se verifica */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f6e5f5, #e8f0ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        .auth-loading h2 {
+            color: #5d4e6d;
+            margin-bottom: 20px;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .auth-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(93, 78, 109, 0.3);
+            border-left: 4px solid #5d4e6d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // FUNCIÓN LOGOUT GLOBAL - DISPONIBLE INMEDIATAMENTE
+        function logout() {
+            console.log('🚪 LOGOUT EJECUTADO');
+            // Limpiar todos los datos de sesión
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Redirigir inmediatamente al login
+            window.location.href = 'auth.html';
+        }
+
+        // Asegurar que esté disponible globalmente
+        window.logout = logout;
+        
+        // BLOQUEO ABSOLUTO - Interceptar ANTES de que se cargue cualquier cosa
+        (function() {
+            // Bloquear INMEDIATAMENTE toda la página
+            document.write('<div id="blockScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#f6e5f5,#e8f0ff);z-index:999999;display:flex;align-items:center;justify-content:center;flex-direction:column;"><h2 style="color:#5d4e6d;font-family:Quicksand,sans-serif;">Verificando acceso...</h2><div style="width:40px;height:40px;border:4px solid rgba(93,78,109,0.3);border-left:4px solid #5d4e6d;border-radius:50%;animation:spin 1s linear infinite;"></div></div><style>@keyframes spin{to{transform:rotate(360deg);}}</style>');
+            
+            console.log('🛡️ BLOQUEO ABSOLUTO - Verificando acceso...');
+            
+            // Función para redireccionar INMEDIATAMENTE
+            function forceRedirect() {
+                console.log('❌ ACCESO DENEGADO - Redirigiendo AHORA...');
+                window.stop(); // Detener carga de la página
+                window.location.replace('index.html?logout=true');
+            }
+            
+            // Verificación INMEDIATA
+            const sessionData = localStorage.getItem('empathy_session');
+            
+            if (!sessionData) {
+                console.log('❌ No hay sesión - BLOQUEANDO...');
+                forceRedirect();
+                return;
+            }
+
+            try {
+                const session = JSON.parse(sessionData);
+                const now = new Date();
+                const expiresAt = new Date(session.expiresAt);
+
+                if (now > expiresAt) {
+                    console.log('❌ Sesión expirada - BLOQUEANDO...');
+                    localStorage.removeItem('empathy_session');
+                    forceRedirect();
+                    return;
+                }
+                
+                // Verificar usuario
+                const users = JSON.parse(localStorage.getItem('empathy_users') || '[]');
+                const user = users.find(u => u.id === session.userId && u.isActive !== false);
+                
+                if (!user) {
+                    console.log('❌ Usuario no válido - BLOQUEANDO...');
+                    localStorage.removeItem('empathy_session');
+                    forceRedirect();
+                    return;
+                }
+                
+                console.log('✅ Acceso autorizado para:', user.name);
+                console.log('🔓 Desbloqueando interfaz - agregando clase authenticated');
+                // Autorizar acceso: agregar clase authenticated y remover bloqueo
+                setTimeout(() => {
+                    // Agregar clase authenticated al body para mostrar contenido
+                    document.body.classList.add('authenticated');
+                    console.log('✅ Clase authenticated agregada al body');
+                    
+                    const block = document.getElementById('blockScreen');
+                    if (block) {
+                        console.log('🗑️ Removiendo pantalla de bloqueo');
+                        block.style.opacity = '0';
+                        setTimeout(() => block.remove(), 300);
+                    }
+                    
+                    // Remover pantalla de carga también
+                    const authLoading = document.getElementById('authLoading');
+                    if (authLoading) {
+                        console.log('🗑️ Removiendo pantalla de carga');
+                        authLoading.style.opacity = '0';
+                        setTimeout(() => authLoading.remove(), 300);
+                    }
+                    
+                    console.log('🎉 Interfaz completamente desbloqueada');
+                }, 500);
+                
+            } catch (error) {
+                console.log('❌ Error en verificación - BLOQUEANDO...');
+                localStorage.removeItem('empathy_session');
+                forceRedirect();
+                return;
+            }
+        })();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="auth-guard.js" defer></script>
+    <script src="main.js" defer></script>
+    <script src="carta-gsap-fixed.js" defer></script>
+</head>
+
+<body>
+    <!-- Pantalla de verificación de autenticación -->
+    <div class="auth-loading" id="authLoading">
+        <h2>Verificando acceso...</h2>
+        <div class="auth-spinner"></div>
+    </div>
+
+    <header>
+
+        <nav>
+            <div class="nav-logo empathy-logo">
+                <!-- <img src="images/logo.png" alt="Logo" style="height:40px; vertical-align:middle; margin-right:10px;"> -->
+                <span class="site-title">
+                    <span class="empathy-letter empathy-e">E</span>
+                    <span class="empathy-letter empathy-m">m</span>
+                    <span class="empathy-letter empathy-p">p</span>
+                    <span class="empathy-letter empathy-a">a</span>
+                    <span class="empathy-letter empathy-t">t</span>
+                    <span class="empathy-letter empathy-h">h</span>
+                    <span class="empathy-letter empathy-y">y</span>
+                </span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#inicio" class="nav-button">Inicio</a></li>
+                <li><a href="#testimonios" class="nav-button">Testimonios</a></li>
+                <li><a href="#recursos" class="nav-button">Recursos</a></li>
+                <li><a href="#contacto" class="nav-button">Contacto</a></li>
+                <li><a href="#nosotros" class="nav-button">Nosotros</a></li>
+                <li><a href="#estadisticas" class="nav-button">📊 Estadísticas</a></li>
+                <li><a href="#chat" class="nav-button chat-button"><span>Chat en Vivo</span></a></li>
+                <li><button class="nav-button logout-button" onclick="logout()" style="opacity: 0.7; font-size: 0.9rem; background: none; border: none; color: inherit; cursor: pointer;">🚪 Salir</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Icono flotante del chatbot -->
+    <div id="n8n-chat-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <!-- El chatbot se cargará aquí -->
+    </div>
+
+    <section id="inicio" style="display:block;">
+        <div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f6e5f5, #e8f0ff); text-align: center; padding: 40px 20px;">
+            <div>
+                <h1 style="font-size: 3.5rem; color: #5d4e6d; margin-bottom: 30px; font-family: 'Super Adorable', cursive;">
+                    Bienvenido a Empathy
+                </h1>
+                <p style="font-size: 1.3rem; color: #666; margin-bottom: 40px; max-width: 600px; line-height: 1.6;">
+                    Un espacio seguro donde puedes encontrar apoyo, comprensión y herramientas para tu bienestar emocional.
+                </p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="#testimonios" style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;">
+                        Ver Testimonios
+                    </a>
+                    <a href="#nosotros" style="background: linear-gradient(135deg, #B71C1C, #E65100); color: white; padding: 15px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;">
+                        Conoce al Equipo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="testimonios" class="testimonios-section" style="display:none;">
+        <div class="testimonios-container">
+            <!-- Testimonio 1 -->
+            <div class="testimonio-carta-wrapper">
+                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Definiciones para sombras y gradientes -->
+                    <defs>
+                        <filter id="sombraSobre1" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                            <feOffset dx="2" dy="5" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.2"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="sombraHoja1" x="-10%" y="-10%" width="120%" height="120%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+                            <feOffset dx="0" dy="1" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.15"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="sombraSello1" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                            <feOffset dx="1" dy="3" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.4"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <radialGradient id="gradienteSello1" cx="0.3" cy="0.3" r="0.8">
+                            <stop offset="0%" style="stop-color:#A52A2A;stop-opacity:1" />
+                            <stop offset="60%" style="stop-color:#8B0000;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#5D0000;stop-opacity:1" />
+                        </radialGradient>
+                        <linearGradient id="gradienteCuerpo1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="gradienteTapa1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Cuerpo principal del sobre -->
+                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpo1)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobre1)"/>
+                    
+                    <!-- Forma en X (parte trasera del sobre cerrado) -->
+                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
+                    
+                    <!-- Hoja/carta que se desliza hacia arriba en hover - OCULTA INICIALMENTE -->
+                    <g class="carta-contenido" transform="translate(0,0)">
+                        <!-- Papel de la carta -->
+                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHoja1)" opacity="0.95"/>
+                        
+                        <!-- Contenido del testimonio -->
+                        <foreignObject x="100" y="140" width="200" height="100">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
+                                "Empathy me ayudó a superar momentos muy difíciles. El apoyo y la comprensión que encontré aquí transformaron mi vida completamente."
+                            </div>
+                        </foreignObject>
+                    </g>
+                    
+                    <!-- Bordes tricolores del sobre aéreo -->
+                    <!-- Borde izquierdo -->
+                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
+                    
+                    <!-- Borde derecho -->
+                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
+                    
+                    <!-- Borde inferior -->
+                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
+                    
+                    <!-- Solapa del sobre que se abre en hover -->
+                    <g class="solapa-sobre" transform-origin="200 120">
+                        <!-- Tapa cerrada del sobre -->
+                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa1)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre1)"/>
+                        
+                        <!-- Línea de sellado -->
+                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
+                        
+                        <!-- Sombra interior de sellado -->
+                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
+                        
+                        <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
+                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello1)" opacity="0.95"/>
+                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
+                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
+                    </g>
+                    
+                    <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
+                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(3 110 240)">
+                        María González
+                    </text>
+                </svg>
+            </div>
+            
+            <!-- Testimonio 2 -->
+            <div class="testimonio-carta-wrapper">
+                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="sombraSobre2" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                            <feOffset dx="2" dy="5" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.2"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="sombraHoja2" x="-10%" y="-10%" width="120%" height="120%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+                            <feOffset dx="0" dy="1" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.15"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="sombraSello2" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                            <feOffset dx="1" dy="3" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.4"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <radialGradient id="gradienteSello2" cx="0.3" cy="0.3" r="0.8">
+                            <stop offset="0%" style="stop-color:#A52A2A;stop-opacity:1" />
+                            <stop offset="60%" style="stop-color:#8B0000;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#5D0000;stop-opacity:1" />
+                        </radialGradient>
+                        <linearGradient id="gradienteCuerpo2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="gradienteTapa2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Cuerpo principal del sobre -->
+                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpo2)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobre2)"/>
+                    
+                    <!-- Forma en X (parte trasera del sobre cerrado) -->
+                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
+                    
+                    <!-- Hoja/carta que se desliza hacia arriba en hover - OCULTA INICIALMENTE -->
+                    <g class="carta-contenido" transform="translate(0,0)">
+                        <!-- Papel de la carta -->
+                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHoja2)" opacity="0.95"/>
+                        
+                        <!-- Contenido del testimonio -->
+                        <foreignObject x="100" y="140" width="200" height="100">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
+                                "Gracias a Empathy, aprendí a valorarme y a encontrar esperanza cuando todo parecía perdido. Su equipo es excepcional."
+                            </div>
+                        </foreignObject>
+                    </g>
+                    
+                    <!-- Bordes tricolores iguales -->
+                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
+                    
+                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
+                    
+                    <!-- Borde inferior -->
+                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
+                    
+                    <!-- Solapa del sobre que se abre en hover -->
+                    <g class="solapa-sobre" transform-origin="200 120">
+                        <!-- Tapa cerrada del sobre -->
+                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa2)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre2)"/>
+                        
+                        <!-- Línea de sellado -->
+                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
+                        
+                        <!-- Sombra interior de sellado -->
+                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
+                        
+                        <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
+                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello2)" opacity="0.95"/>
+                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
+                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
+                    </g>
+                    
+                    <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
+                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(-3 110 240)">
+                        Carlos Rodríguez
+                    </text>
+                </svg>
+            </div>
+            
+            <!-- Testimonio 3 -->
+            <div class="testimonio-carta-wrapper">
+                <svg class="sobre-cerrado" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="sombraSobre3" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                            <feOffset dx="2" dy="5" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.2"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="sombraHoja3" x="-10%" y="-10%" width="120%" height="120%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+                            <feOffset dx="0" dy="1" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.15"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <filter id="sombraSello3" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                            <feOffset dx="1" dy="3" result="offset"/>
+                            <feFlood flood-color="#000" flood-opacity="0.4"/>
+                            <feComposite in2="offset" operator="in"/>
+                            <feMerge>
+                                <feMergeNode/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <radialGradient id="gradienteSello3" cx="0.3" cy="0.3" r="0.8">
+                            <stop offset="0%" style="stop-color:#A52A2A;stop-opacity:1" />
+                            <stop offset="60%" style="stop-color:#8B0000;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#5D0000;stop-opacity:1" />
+                        </radialGradient>
+                        <linearGradient id="gradienteCuerpo3" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="gradienteTapa3" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e8e8e8;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#d5d5d5;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Cuerpo principal del sobre -->
+                    <rect x="80" y="120" width="240" height="140" fill="url(#gradienteCuerpo3)" stroke="#ccc" stroke-width="2" rx="3" filter="url(#sombraSobre3)"/>
+                    
+                    <!-- Forma en X (parte trasera del sobre cerrado) -->
+                    <polygon points="80,120 200,200 320,120 320,260 200,200 80,260" fill="#e0e0e0" stroke="#bbb" stroke-width="1" opacity="0.3"/>
+                    
+                    <!-- Hoja/carta que se desliza hacia arriba en hover - OCULTA INICIALMENTE -->
+                    <g class="carta-contenido" transform="translate(0,0)">
+                        <!-- Papel de la carta -->
+                        <rect x="90" y="130" width="220" height="120" fill="#ffffff" stroke="#e0e0e0" stroke-width="1" rx="2" filter="url(#sombraHoja3)" opacity="0.95"/>
+                        
+                        <!-- Contenido del testimonio -->
+                        <foreignObject x="100" y="140" width="200" height="100">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Quicksand', sans-serif; font-size: 11px; line-height: 1.4; color: #333; padding: 8px; text-align: justify;">
+                                "El acompañamiento de Empathy fue fundamental en mi proceso de sanación. Encontré un espacio seguro para crecer."
+                            </div>
+                        </foreignObject>
+                    </g>
+                    
+                    <!-- Bordes tricolores iguales -->
+                    <rect x="80" y="120" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="132" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="144" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="156" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="168" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="180" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="192" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="204" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="216" width="6" height="12" fill="#007bff"/>
+                    <rect x="80" y="228" width="6" height="12" fill="#dc3545"/>
+                    <rect x="80" y="240" width="6" height="12" fill="#ffffff"/>
+                    <rect x="80" y="252" width="6" height="8" fill="#007bff"/>
+                    
+                    <rect x="314" y="120" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="132" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="144" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="156" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="168" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="180" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="192" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="204" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="216" width="6" height="12" fill="#007bff"/>
+                    <rect x="314" y="228" width="6" height="12" fill="#dc3545"/>
+                    <rect x="314" y="240" width="6" height="12" fill="#ffffff"/>
+                    <rect x="314" y="252" width="6" height="8" fill="#007bff"/>
+                    
+                    <!-- Borde inferior -->
+                    <rect x="86" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="98" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="110" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="122" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="134" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="146" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="158" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="170" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="182" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="194" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="206" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="218" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="230" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="242" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="254" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="266" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="278" y="254" width="12" height="6" fill="#ffffff"/>
+                    <rect x="290" y="254" width="12" height="6" fill="#007bff"/>
+                    <rect x="302" y="254" width="12" height="6" fill="#dc3545"/>
+                    <rect x="314" y="254" width="6" height="6" fill="#ffffff"/>
+                    
+                    <!-- Solapa del sobre que se abre en hover -->
+                    <g class="solapa-sobre" transform-origin="200 120">
+                        <!-- Tapa cerrada del sobre -->
+                        <polygon points="80,120 200,200 320,120" fill="url(#gradienteTapa3)" stroke="#aaa" stroke-width="2" filter="url(#sombraSobre3)"/>
+                        
+                        <!-- Línea de sellado -->
+                        <line x1="80" y1="120" x2="320" y2="120" stroke="#999" stroke-width="1.5" opacity="0.8"/>
+                        
+                        <!-- Sombra interior de sellado -->
+                        <polygon points="80,120 200,200 320,120 300,130 200,185 100,130" fill="#d0d0d0" opacity="0.6"/>
+                        
+                        <!-- Sello redondo con logo en el centro del sobre (sobre la solapa) -->
+                        <circle cx="200" cy="160" r="22" fill="#ffffff" stroke="#ddd" stroke-width="2" filter="url(#sombraSello3)" opacity="0.95"/>
+                        <circle cx="200" cy="160" r="20" fill="none" stroke="#ccc" stroke-width="1" opacity="0.8"/>
+                        <image x="182" y="142" width="36" height="36" href="images/logo.png" opacity="0.9"/>
+                    </g>
+                    
+                    <!-- Firma manuscrita en la parte inferior izquierda del sobre -->
+                    <text x="110" y="240" font-family="'Great Vibes', 'Dancing Script', cursive" font-size="16" font-weight="400" fill="#1A237E" transform="rotate(-3 110 240)">
+                        Ana Martínez
+                    </text>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Botón para crear nuevo testimonio -->
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn-empathy" id="btn-crear-testimonio">Crea tu testimonio</button>
+        </div>
+    </section>
+    
+    <!-- SECCIÓN NOSOTROS - CONTENIDO ORIGINAL CON ESTILOS FORZADOS -->
+    <section id="nosotros" style="display:none; background: linear-gradient(135deg, #f6e5f5, #e8f0ff); padding: 80px 20px; min-height: 100vh;">
+        <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 3rem; color: #5d4e6d; text-align: center; margin-bottom: 40px; text-shadow: 0 2px 8px rgba(0,0,0,0.10);">Nosotros</h2>
+        
+        <div class="contenido" style="max-width: 1200px; margin: 0 auto 60px auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+            <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 25px; text-align: justify;">Somos un equipo comprometido con el bienestar emocional y social, dedicados a crear espacios de apoyo
+                y empatía para quienes atraviesan momentos difíciles. Nuestra misión es inspirar esperanza y
+                acompañar a las personas en su camino hacia una vida mejor.</p>
+            <br>
+            <ol style="font-size: 1.1rem; color: #555; padding-left: 20px;">
+                <li style="margin: 10px 0;">Escucha activa y acompañamiento</li>
+                <li style="margin: 10px 0;">Recursos y herramientas para el bienestar</li>
+                <li style="margin: 10px 0;">Comunidad de apoyo</li>
+            </ol>
+        </div>
+        
+        <div class="contenido" style="max-width: 1200px; margin: 0 auto 60px auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0;">Nuestra Misión</h2>
+            <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 25px; text-align: center;">Empoderar a las personas a través de la empatía y el apoyo emocional.</p>
+            
+            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0;">Nuestra Visión</h2>
+            <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 25px; text-align: center;">Crear un mundo donde todos se sientan escuchados y comprendidos.</p>
+            
+            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0;">Nuestros Valores</h2>
+            <ul style="list-style: none; padding: 0; max-width: 600px; margin: 0 auto;">
+                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
+                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
+                    Empatía
+                </li>
+                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
+                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
+                    Respeto
+                </li>
+                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
+                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
+                    Solidaridad
+                </li>
+                <li style="background: linear-gradient(135deg, #4A148C, #1A237E); color: white; padding: 15px 20px; margin: 12px 0; border-radius: 25px; font-weight: 500; position: relative; padding-left: 55px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(74, 20, 140, 0.2);">
+                    <span style="position: absolute; left: 20px; font-weight: bold; font-size: 1.3rem; background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; top: 50%; transform: translateY(-50%);">✓</span>
+                    Inclusión
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Sección de Desarrolladores con diseño original y estilos forzados -->
+        <div class="desarrolladores-section" style="max-width: 1200px; margin: 0 auto; padding: 40px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 class="nosotrosTit" style="font-family: 'Super Adorable', cursive; font-size: 2.5rem; color: #A48CA4; text-align: center; margin: 2rem 0; letter-spacing: 1px;">Nuestros Desarrolladores</h2>
+            <div class="card-container">
+                
+                <!-- TARJETA MATEO -->
+                <div class="dev-card-wrapper">
+                    <div class="dev-card">
+                        <!-- FRENTE DE LA TARJETA -->
+                        <div class="card-front">
+                            <div class="card-image">
+                                <img src="images/avatar1.jpg" alt="Mateo">
+                            </div>
+                            <div class="card-name">
+                                <h3>Mateo</h3>
+                            </div>
+                        </div>
+                        <!-- REVERSO DE LA TARJETA -->
+                        <div class="card-back">
+                            <div class="card-info">
+                                <h3>Mateo Suarez</h3>
+                                <p class="role">Frontend Developer</p>
+                                <p class="description">Apasionado del diseño web y la experiencia de usuario. Especializado en crear interfaces intuitivas y visualmente atractivas.</p>
+                                <div class="skills">
+                                    <span>HTML/CSS</span>
+                                    <span>JavaScript</span>
+                                    <span>React</span>
+                                    <span>UI/UX</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TARJETA JHONATAN -->
+                <div class="dev-card-wrapper">
+                    <div class="dev-card">
+                        <!-- FRENTE DE LA TARJETA -->
+                        <div class="card-front">
+                            <div class="card-image">
+                                <img src="images/avatar2.jpg" alt="Jhonatan">
+                            </div>
+                            <div class="card-name">
+                                <h3>Jhonatan</h3>
+                            </div>
+                        </div>
+                        <!-- REVERSO DE LA TARJETA -->
+                        <div class="card-back">
+                            <div class="card-info">
+                                <h3>Jhonatan Martinez</h3>
+                                <p class="role">Backend Developer</p>
+                                <p class="description">Especialista en bases de datos y backend. Enfocado en crear sistemas robustos y escalables para aplicaciones web.</p>
+                                <div class="skills">
+                                    <span>Python</span>
+                                    <span>Django</span>
+                                    <span>PostgreSQL</span>
+                                    <span>APIs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TARJETA KAREN -->
+                <div class="dev-card-wrapper">
+                    <div class="dev-card">
+                        <!-- FRENTE DE LA TARJETA -->
+                        <div class="card-front">
+                            <div class="card-image">
+                                <img src="images/avatar3.jpg" alt="Karen">
+                            </div>
+                            <div class="card-name">
+                                <h3>Karen</h3>
+                            </div>
+                        </div>
+                        <!-- REVERSO DE LA TARJETA -->
+                        <div class="card-back">
+                            <div class="card-info">
+                                <h3>Karen López</h3>
+                                <p class="role">Full Stack Developer</p>
+                                <p class="description">Creativa y enfocada en resolver problemas. Combina diseño y desarrollo para crear soluciones completas e innovadoras.</p>
+                                <div class="skills">
+                                    <span>JavaScript</span>
+                                    <span>Node.js</span>
+                                    <span>MongoDB</span>
+                                    <span>Design</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- Sección de Estadísticas -->
+    <section id="estadisticas" style="display:none; background: linear-gradient(135deg, #f6e5f5, #e8f0ff); padding: 80px 20px; min-height: 100vh;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <h2 style="font-family: 'Super Adorable', cursive; font-size: 3rem; color: #5d4e6d; text-align: center; margin-bottom: 50px;">
+                📊 Dashboard de Estadísticas
+            </h2>
+            
+            <!-- Panel de Métricas Principales -->
+            <div class="metrics-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 40px;">
+                <!-- Total de Usuarios -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">👥</div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: bold;" id="total-users">0</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 1.1rem; opacity: 0.9;">Total de Usuarios</p>
+                </div>
+                
+                <!-- Usuarios Femeninos -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">👩</div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: bold;" id="total-women">0</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 1.1rem; opacity: 0.9;">Mujeres</p>
+                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;" id="women-percentage">0%</p>
+                </div>
+                
+                <!-- Usuarios Masculinos -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">👨</div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: bold;" id="total-men">0</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 1.1rem; opacity: 0.9;">Hombres</p>
+                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;" id="men-percentage">0%</p>
+                </div>
+                
+                <!-- Otros Géneros -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #a8edea, #fed6e3); color: #333; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 25px rgba(168, 237, 234, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🌈</div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: bold;" id="total-otros">0</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 1.1rem;">Otros</p>
+                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;" id="otros-percentage">0%</p>
+                </div>
+                
+                <!-- Mayores de Edad -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #ffecd2, #fcb69f); color: #333; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 25px rgba(255, 236, 210, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🧑‍💼</div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: bold;" id="total-adults">0</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 1.1rem;">Mayores de Edad</p>
+                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;" id="adults-percentage">0%</p>
+                </div>
+                
+                <!-- Menores de Edad -->
+                <div class="metric-card" style="background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #333; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">👶</div>
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: bold;" id="total-minors">0</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 1.1rem;">Menores de Edad</p>
+                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;" id="minors-percentage">0%</p>
+                </div>
+            </div>
+            
+            <!-- Gráficos Dashboard -->
+            <div class="charts-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 40px;">
+                <!-- Gráfico de Géneros -->
+                <div class="chart-card" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <h3 style="color: #5d4e6d; text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Distribución por Género</h3>
+                    <div style="position: relative; height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="genderChart" width="300" height="300"></canvas>
+                    </div>
+                    <div id="gender-stats" style="margin-top: 20px; text-align: center;">
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                            <div style="background: #f093fb; color: white; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem;">
+                                <strong>Femenino: <span id="fem-count">0</span></strong>
+                            </div>
+                            <div style="background: #4facfe; color: white; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem;">
+                                <strong>Masculino: <span id="masc-count">0</span></strong>
+                            </div>
+                            <div style="background: #a8edea; color: #333; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem;">
+                                <strong>Otro: <span id="otro-count">0</span></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Edades -->
+                <div class="chart-card" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <h3 style="color: #5d4e6d; text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Distribución por Edad</h3>
+                    <div style="position: relative; height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="ageChart" width="300" height="300"></canvas>
+                    </div>
+                    <div id="age-stats" style="margin-top: 20px; text-align: center;">
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                            <div style="background: #ffecd2; color: #333; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem;">
+                                <strong>Mayores (18+): <span id="adults-count">0</span></strong>
+                            </div>
+                            <div style="background: #ff9a9e; color: white; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem;">
+                                <strong>Menores (≤17): <span id="minors-count">0</span></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico de Barras de Rangos de Edad -->
+            <div class="bar-chart-container" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 30px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <h3 style="color: #5d4e6d; text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Rangos de Edad Detallados</h3>
+                <div style="position: relative; height: 350px;">
+                    <canvas id="ageRangeChart" width="800" height="350"></canvas>
+                </div>
+                <div id="age-range-stats" style="margin-top: 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;">
+                    <!-- Estadísticas de rangos generadas dinámicamente -->
+                </div>
+            </div>
+            
+            <!-- Tabla de Usuarios Detallada -->
+            <div class="users-table-container" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 30px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <h3 style="color: #5d4e6d; text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Usuarios Registrados</h3>
+                <div id="users-table" style="overflow-x: auto;">
+                    <!-- Tabla generada dinámicamente -->
+                </div>
+            </div>
+            
+            <!-- Panel de Actualización -->
+            <div class="update-panel" style="background: linear-gradient(135deg, #E8F5E8, #F0F8FF); border-radius: 20px; padding: 25px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); border-left: 5px solid #4CAF50;">
+                <h3 style="color: #2E7D32; text-align: center; margin-bottom: 20px;">🔄 Actualización Automática</h3>
+                <p style="color: #555; text-align: center; margin-bottom: 15px;">
+                    Las estadísticas se actualizan automáticamente cada vez que un nuevo usuario se registra en el sistema.
+                </p>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="updateStats()" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; border: none; padding: 12px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); transition: all 0.3s ease; margin-right: 10px;">
+                        🔄 Actualizar Dashboard
+                    </button>
+                    <button onclick="downloadStats()" style="background: linear-gradient(135deg, #2196F3, #1976D2); color: white; border: none; padding: 12px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3); transition: all 0.3s ease;">
+                        📊 Descargar Estadísticas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Recursos -->
+    <section id="recursos" style="display:none;">
+        <div>
+            <h2>Recursos de Bienestar</h2>
+            <div style="max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <h3 style="color: #5d4e6d; margin-bottom: 30px; text-align: center;">Herramientas para tu Bienestar</h3>
+                <div class="grid-recursos">
+                    <div class="recurso-card">
+                        <h4>🧘‍♀️ Meditación</h4>
+                        <p style="color: #555;">Técnicas de relajación y mindfulness para reducir el estrés y la ansiedad.</p>
+                    </div>
+                    <div class="recurso-card">
+                        <h4>📚 Recursos Educativos</h4>
+                        <p style="color: #555;">Artículos y guías sobre salud mental y bienestar emocional.</p>
+                    </div>
+                    <div class="recurso-card">
+                        <h4>🤝 Apoyo Comunitario</h4>
+                        <p style="color: #555;">Conecta con personas que comparten experiencias similares.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-empathy">Explorar Recursos</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Contacto -->
+    <section id="contacto" style="display:none;">
+        <div>
+            <h2>Contáctanos</h2>
+            <div>
+                <div class="contact-section">
+                    <h3 style="text-align: center; color: #5d4e6d; margin-bottom: 30px;">¿Necesitas ayuda? Estamos aquí para apoyarte</h3>
+                    <form class="contact-form">
+                        <div class="form-container">
+                            <div>
+                                <label for="nombre">Nombre:</label>
+                                <input type="text" id="nombre" name="nombre" required>
+
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" name="email" required>
+
+                                <label for="asunto">Asunto:</label>
+                                <input type="text" id="asunto" name="asunto" required>
+
+                                <label for="mensaje">Mensaje:</label>
+                                <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos cómo podemos ayudarte..." required></textarea>
+
+                                <button type="submit">Enviar Mensaje</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal flotante para crear testimonio -->
+    <div id="modal-crear-testimonio" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Crear Nuevo Testimonio</h3>
+                <button class="modal-close" id="cerrar-modal">&times;</button>
+            </div>
+            <form id="form-crear-testimonio" class="crear-testimonio-form">
+                <div class="form-group">
+                    <label for="nombre-testimonio">Tu nombre:</label>
+                    <input type="text" id="nombre-testimonio" name="nombre" maxlength="50" required placeholder="Ingresa tu nombre">
+                    <small class="char-counter">0/50</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mensaje-testimonio">Tu testimonio:</label>
+                    <textarea id="mensaje-testimonio" name="mensaje" rows="6" maxlength="300" required placeholder="Comparte tu experiencia y cómo Empathy te ha ayudado..."></textarea>
+                    <small class="char-counter">0/300</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color-testimonio">Color del testimonio:</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="color-testimonio" name="color" value="#A48CA4">
+                        <span class="color-preview">Color seleccionado: #A48CA4</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="avatar-testimonio">Avatar personalizado:</label>
+                    <div class="avatar-upload-container">
+                        <input type="file" id="avatar-testimonio" name="avatar" accept="image/*" style="display: none;">
+                        <div class="avatar-preview" id="avatar-preview">
+                            <img id="avatar-preview-img" src="images/logo.png" alt="Preview">
+                            <div class="upload-overlay">
+                                <span>📷</span>
+                                <p>Subir imagen</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-upload-avatar" onclick="document.getElementById('avatar-testimonio').click()">
+                            Cambiar Avatar
+                        </button>
+                        <p class="upload-hint">Formatos: JPG, PNG, GIF. Se convertirá automáticamente a PNG circular.</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color-sobre-testimonio">Color del sobre:</label>
+                    <div class="color-sobre-container">
+                        <input type="color" id="color-sobre-testimonio" name="colorSobre" value="#e8e8e8">
+                        <div class="color-sobre-preview">
+                            <div class="sobre-miniatura">
+                                <div class="cuerpo-sobre"></div>
+                                <div class="solapa-sobre"></div>
+                            </div>
+                            <span class="color-sobre-text">Color pastel aplicado</span>
+                        </div>
+                    </div>
+                    <p class="color-sobre-hint">El color se convertirá automáticamente a tono pastel para el sobre.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color-carta-testimonio">Color de la carta:</label>
+                    <div class="color-carta-container">
+                        <input type="color" id="color-carta-testimonio" name="colorCarta" value="#d1c1e0">
+                        <div class="color-carta-preview">
+                            <div class="carta-miniatura">
+                                <div class="fondo-carta"></div>
+                                <div class="borde-carta"></div>
+                                <div class="texto-carta">Carta</div>
+                            </div>
+                            <span class="color-carta-text">Color pastel aplicado</span>
+                        </div>
+                    </div>
+                    <p class="color-carta-hint">El color se convertirá automáticamente a tono pastel para la carta.</p>
+                </div>
+                
+                <button type="submit" class="btn-crear-testimonio">
+                    Crear Mi Testimonio
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p><b>2025 Empathy @copyriht</b></p>
+
+
+    </footer>
+
+    <script>
+        // ===== DASHBOARD DE ESTADÍSTICAS EN TIEMPO REAL =====
+        window.statsManager = null;
+        
+        // Función para cargar y procesar datos de usuarios
+        function loadUsersData() {
+            try {
+                const usersData = localStorage.getItem('empathy_users');
+                console.log('📊 Cargando datos de localStorage:', usersData ? 'Datos encontrados' : 'No hay datos');
+                
+                if (!usersData) {
+                    console.warn('📊 No hay datos de usuarios en localStorage');
+                    return [];
+                }
+                
+                const users = JSON.parse(usersData);
+                console.log('📊 Datos parseados:', users);
+                
+                if (!Array.isArray(users)) {
+                    console.warn('📊 Los datos de usuarios no son válidos');
+                    return [];
+                }
+                
+                // Filtrar usuarios válidos
+                const validUsers = users.filter(user => {
+                    const isValid = user && user.name && user.email && 
+                        user.gender !== undefined && user.age !== undefined;
+                    
+                    if (!isValid) {
+                        console.warn('📊 Usuario con datos incompletos:', user);
+                    }
+                    
+                    return isValid;
+                });
+                
+                console.log('📊 Usuarios válidos cargados para dashboard:', validUsers.length);
+                console.log('📊 Usuarios detallados:', validUsers.map(u => ({
+                    name: u.name,
+                    gender: u.gender,
+                    age: u.age,
+                    email: u.email
+                })));
+                
+                return validUsers;
+            } catch (error) {
+                console.error('📊 Error al cargar datos de usuarios:', error);
+                return [];
+            }
+        }
+        
+        // Función para calcular estadísticas
+        function calculateStatistics(users) {
+            const stats = {
+                total: users.length,
+                genders: {
+                    femenino: users.filter(u => u.gender === 'femenino').length,
+                    masculino: users.filter(u => u.gender === 'masculino').length,
+                    otro: users.filter(u => u.gender === 'otro').length
+                },
+                ages: {
+                    adults: users.filter(u => u.age >= 18).length,
+                    minors: users.filter(u => u.age <= 17).length
+                },
+                ageRanges: {
+                    '13-17': users.filter(u => u.age >= 13 && u.age <= 17).length,
+                    '18-25': users.filter(u => u.age >= 18 && u.age <= 25).length,
+                    '26-35': users.filter(u => u.age >= 26 && u.age <= 35).length,
+                    '36-45': users.filter(u => u.age >= 36 && u.age <= 45).length,
+                    '46-55': users.filter(u => u.age >= 46 && u.age <= 55).length,
+                    '56+': users.filter(u => u.age >= 56).length
+                }
+            };
+            
+            // Calcular porcentajes
+            if (stats.total > 0) {
+                stats.genders.femeninoPercent = ((stats.genders.femenino / stats.total) * 100).toFixed(1);
+                stats.genders.masculinoPercent = ((stats.genders.masculino / stats.total) * 100).toFixed(1);
+                stats.genders.otroPercent = ((stats.genders.otro / stats.total) * 100).toFixed(1);
+                stats.ages.adultsPercent = ((stats.ages.adults / stats.total) * 100).toFixed(1);
+                stats.ages.minorsPercent = ((stats.ages.minors / stats.total) * 100).toFixed(1);
+            } else {
+                stats.genders.femeninoPercent = '0.0';
+                stats.genders.masculinoPercent = '0.0';
+                stats.genders.otroPercent = '0.0';
+                stats.ages.adultsPercent = '0.0';
+                stats.ages.minorsPercent = '0.0';
+            }
+            
+            console.log('📊 Estadísticas calculadas:', stats);
+            return stats;
+        }
+        
+        // Función para actualizar métricas principales
+        function updateMetrics(stats) {
+            console.log('📊 Actualizando métricas principales con:', stats);
+            
+            const elements = {
+                'total-users': stats.total,
+                'total-women': stats.genders.femenino,
+                'total-men': stats.genders.masculino,
+                'total-otros': stats.genders.otro,
+                'total-adults': stats.ages.adults,
+                'total-minors': stats.ages.minors
+            };
+            
+            // Actualizar números principales
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                    console.log(`📊 ${id}: ${value}`);
+                } else {
+                    console.warn(`📊 Elemento ${id} no encontrado`);
+                }
+            });
+            
+            // Actualizar porcentajes
+            const percentages = {
+                'women-percentage': stats.genders.femeninoPercent || '0',
+                'men-percentage': stats.genders.masculinoPercent || '0',
+                'otros-percentage': stats.genders.otroPercent || '0',
+                'adults-percentage': stats.ages.adultsPercent || '0',
+                'minors-percentage': stats.ages.minorsPercent || '0'
+            };
+            
+            Object.entries(percentages).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value + '%';
+                    console.log(`📊 ${id}: ${value}%`);
+                }
+            });
+            
+            // Actualizar contadores en gráficos
+            const counts = {
+                'fem-count': stats.genders.femenino,
+                'masc-count': stats.genders.masculino,
+                'otro-count': stats.genders.otro,
+                'adults-count': stats.ages.adults,
+                'minors-count': stats.ages.minors
+            };
+            
+            Object.entries(counts).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+            
+            console.log('✅ Métricas actualizadas correctamente');
+        }
+        
+        // Función para generar gráfico de géneros (dona)
+        function generateGenderChart(stats) {
+            const canvas = document.getElementById('genderChart');
+            if (!canvas) {
+                console.error('❌ Canvas genderChart no encontrado');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (stats.total === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No hay datos disponibles', canvas.width/2, canvas.height/2);
+                return;
+            }
+            
+            console.log('📊 Generando gráfico de géneros con datos:', stats.genders);
+            
+            const data = [
+                { label: 'Femenino', value: stats.genders.femenino, color: '#f093fb' },
+                { label: 'Masculino', value: stats.genders.masculino, color: '#4facfe' },
+                { label: 'Otro', value: stats.genders.otro, color: '#a8edea' }
+            ];
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 100;
+            const innerRadius = 50;
+            
+            let currentAngle = -Math.PI / 2;
+            
+            data.forEach(item => {
+                if (item.value > 0) {
+                    const sliceAngle = (item.value / stats.total) * 2 * Math.PI;
+                    
+                    // Dibujar sector
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                    ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+                    ctx.closePath();
+                    ctx.fillStyle = item.color;
+                    ctx.fill();
+                    
+                    // Dibujar borde
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Dibujar porcentaje
+                    const textAngle = currentAngle + sliceAngle / 2;
+                    const textRadius = (radius + innerRadius) / 2;
+                    const textX = centerX + Math.cos(textAngle) * textRadius;
+                    const textY = centerY + Math.sin(textAngle) * textRadius;
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(((item.value / stats.total) * 100).toFixed(1) + '%', textX, textY);
+                    
+                    currentAngle += sliceAngle;
+                }
+            });
+            
+            // Dibujar texto central
+            ctx.fillStyle = '#5d4e6d';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Géneros', centerX, centerY - 5);
+            ctx.font = '14px Arial';
+            ctx.fillText(stats.total + ' usuarios', centerX, centerY + 15);
+            
+            console.log('✅ Gráfico de géneros generado correctamente');
+        }
+        
+        // Función para generar gráfico de edades (dona)
+        function generateAgeChart(stats) {
+            const canvas = document.getElementById('ageChart');
+            if (!canvas) {
+                console.error('❌ Canvas ageChart no encontrado');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (stats.total === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No hay datos disponibles', canvas.width/2, canvas.height/2);
+                return;
+            }
+            
+            console.log('📊 Generando gráfico de edades con datos:', stats.ages);
+            
+            const data = [
+                { label: 'Mayores de Edad', value: stats.ages.adults, color: '#ffecd2' },
+                { label: 'Menores de Edad', value: stats.ages.minors, color: '#ff9a9e' }
+            ];
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 100;
+            const innerRadius = 50;
+            
+            let currentAngle = -Math.PI / 2;
+            
+            data.forEach(item => {
+                if (item.value > 0) {
+                    const sliceAngle = (item.value / stats.total) * 2 * Math.PI;
+                    
+                    // Dibujar sector
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                    ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+                    ctx.closePath();
+                    ctx.fillStyle = item.color;
+                    ctx.fill();
+                    
+                    // Dibujar borde
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Dibujar porcentaje
+                    const textAngle = currentAngle + sliceAngle / 2;
+                    const textRadius = (radius + innerRadius) / 2;
+                    const textX = centerX + Math.cos(textAngle) * textRadius;
+                    const textY = centerY + Math.sin(textAngle) * textRadius;
+                    
+                    ctx.fillStyle = item.label === 'Mayores de Edad' ? '#333' : 'white';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(((item.value / stats.total) * 100).toFixed(1) + '%', textX, textY);
+                    
+                    currentAngle += sliceAngle;
+                }
+            });
+            
+            // Dibujar texto central
+            ctx.fillStyle = '#5d4e6d';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Edades', centerX, centerY - 5);
+            ctx.font = '14px Arial';
+            ctx.fillText(stats.total + ' usuarios', centerX, centerY + 15);
+            
+            console.log('✅ Gráfico de edades generado correctamente');
+        }
+        
+        // Función para generar gráfico de barras de rangos de edad
+        function generateAgeRangeChart(stats) {
+            const canvas = document.getElementById('ageRangeChart');
+            if (!canvas) {
+                console.error('❌ Canvas ageRangeChart no encontrado');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (stats.total === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No hay datos disponibles', canvas.width/2, canvas.height/2);
+                return;
+            }
+            
+            console.log('📊 Generando gráfico de rangos de edad con datos:', stats.ageRanges);
+            
+            const ranges = [
+                { label: '13-17', value: stats.ageRanges['13-17'], color: '#ff9a9e' },
+                { label: '18-25', value: stats.ageRanges['18-25'], color: '#ffecd2' },
+                { label: '26-35', value: stats.ageRanges['26-35'], color: '#a8edea' },
+                { label: '36-45', value: stats.ageRanges['36-45'], color: '#4facfe' },
+                { label: '46-55', value: stats.ageRanges['46-55'], color: '#f093fb' },
+                { label: '56+', value: stats.ageRanges['56+'], color: '#667eea' }
+            ];
+            
+            const barWidth = 100;
+            const barSpacing = 20;
+            const chartHeight = 250;
+            const chartTop = 50;
+            const maxValue = Math.max(...ranges.map(r => r.value)) || 1;
+            
+            // Dibujar título
+            ctx.fillStyle = '#5d4e6d';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Rangos de Edad', canvas.width / 2, 25);
+            
+            ranges.forEach((range, index) => {
+                const x = 50 + (index * (barWidth + barSpacing));
+                const barHeight = (range.value / maxValue) * chartHeight;
+                const y = chartTop + chartHeight - barHeight;
+                
+                // Dibujar barra
+                ctx.fillStyle = range.color;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // Dibujar borde de la barra
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, barWidth, barHeight);
+                
+                // Dibujar valor encima de la barra
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(range.value.toString(), x + barWidth/2, y - 8);
+                
+                // Dibujar porcentaje dentro de la barra si es lo suficientemente alta
+                if (barHeight > 30) {
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.fillText(((range.value / stats.total) * 100).toFixed(1) + '%', x + barWidth/2, y + barHeight/2);
+                }
+                
+                // Dibujar etiqueta debajo
+                ctx.fillStyle = '#5d4e6d';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText(range.label, x + barWidth/2, chartTop + chartHeight + 20);
+                ctx.font = '10px Arial';
+                ctx.fillText('años', x + barWidth/2, chartTop + chartHeight + 35);
+            });
+            
+            console.log('✅ Gráfico de rangos de edad generado correctamente');
+        }
+        
+        // Función para generar tabla de usuarios
+        function generateUsersTable(users) {
+            const container = document.getElementById('users-table');
+            if (!container) {
+                console.error('❌ Contenedor users-table no encontrado');
+                return;
+            }
+            
+            console.log('📊 Generando tabla de usuarios con:', users.length, 'usuarios');
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No hay usuarios registrados</p>';
+                return;
+            }
+            
+            let tableHTML = `
+                <table style="width: 100%; border-collapse: collapse; font-family: 'Quicksand', sans-serif; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #5d4e6d, #4a3c57); color: white;">
+                            <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd; font-weight: 600;">Nombre</th>
+                            <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd; font-weight: 600;">Email</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd; font-weight: 600;">Género</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd; font-weight: 600;">Edad</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd; font-weight: 600;">Categoría</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd; font-weight: 600;">Fecha de Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            users.forEach((user, index) => {
+                const categoria = user.age >= 18 ? 'Mayor de Edad' : 'Menor de Edad';
+                let fechaRegistro = 'N/A';
+                
+                if (user.createdAt) {
+                    try {
+                        fechaRegistro = new Date(user.createdAt).toLocaleDateString('es-ES');
+                    } catch (e) {
+                        fechaRegistro = 'N/A';
+                    }
+                }
+                
+                const rowColor = index % 2 === 0 ? 'rgba(93, 78, 109, 0.03)' : 'rgba(255, 255, 255, 0.95)';
+                
+                const genderColor = user.gender === 'femenino' ? '#f093fb' : 
+                                   user.gender === 'masculino' ? '#4facfe' : '#a8edea';
+                
+                const categoryColor = user.age >= 18 ? '#ffecd2' : '#ff9a9e';
+                const categoryTextColor = user.age >= 18 ? '#333' : 'white';
+                
+                tableHTML += `
+                    <tr style="background: ${rowColor}; transition: all 0.3s ease;" 
+                        onmouseover="this.style.background='rgba(93, 78, 109, 0.1); this.style.transform='translateY(-2px)'" 
+                        onmouseout="this.style.background='${rowColor}'; this.style.transform='translateY(0px)'">
+                        <td style="padding: 15px; border-bottom: 1px solid #eee; font-weight: 500; color: #333;">
+                            ${user.name}
+                        </td>
+                        <td style="padding: 15px; border-bottom: 1px solid #eee; color: #666;">
+                            ${user.email}
+                        </td>
+                        <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center;">
+                            <span style="padding: 6px 12px; border-radius: 15px; font-size: 0.9rem; font-weight: 500;
+                                background: ${genderColor}; color: white; text-transform: capitalize;">
+                                ${user.gender}
+                            </span>
+                        </td>
+                        <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: 600; color: #5d4e6d;">
+                            ${user.age}
+                        </td>
+                        <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center;">
+                            <span style="padding: 6px 12px; border-radius: 15px; font-size: 0.9rem; font-weight: 500;
+                                background: ${categoryColor}; color: ${categoryTextColor};">
+                                ${categoria}
+                            </span>
+                        </td>
+                        <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center; color: #666; font-size: 0.9rem;">
+                            ${fechaRegistro}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px; text-align: center; color: #666; font-size: 0.9rem;">
+                    Total de usuarios registrados: <strong>${users.length}</strong>
+                </div>
+            `;
+            
+            container.innerHTML = tableHTML;
+            console.log('✅ Tabla de usuarios generada correctamente');
+        }
+        
+        // Función principal para refrescar el dashboard
+        function refreshDashboard() {
+            console.log('🔄 Actualizando dashboard de estadísticas...');
+            
+            const users = loadUsersData();
+            console.log('📊 Usuarios obtenidos para dashboard:', users.length);
+            
+            if (users.length === 0) {
+                console.log('⚠️ No hay usuarios para mostrar en el dashboard');
+                // Mostrar mensaje de no hay datos
+                updateMetricsEmpty();
+                return;
+            }
+            
+            const stats = calculateStatistics(users);
+            console.log('📊 Estadísticas calculadas:', stats);
+            
+            updateMetrics(stats);
+            generateGenderChart(stats);
+            generateAgeChart(stats);
+            generateAgeRangeChart(stats);
+            generateUsersTable(users);
+            
+            // Mostrar notificación
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #4CAF50, #45a049);
+                color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+                z-index: 10000; font-family: 'Quicksand', sans-serif; max-width: 300px;
+            `;
+            notification.innerHTML = `
+                <strong>📊 Dashboard actualizado</strong><br>
+                <span>Se procesaron ${users.length} usuarios</span>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 3000);
+        }
+        
+        // Función para mostrar métricas vacías
+        function updateMetricsEmpty() {
+            const elements = ['total-users', 'total-women', 'total-men', 'total-otros', 'total-adults', 'total-minors'];
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '0';
+            });
+            
+            const percentElements = ['women-percentage', 'men-percentage', 'otros-percentage', 'adults-percentage', 'minors-percentage'];
+            percentElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '0%';
+            });
+            
+            const countElements = ['fem-count', 'masc-count', 'otro-count', 'adults-count', 'minors-count'];
+            countElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '0';
+            });
+            
+            // Limpiar gráficos
+            const canvases = ['genderChart', 'ageChart', 'ageRangeChart'];
+            canvases.forEach(id => {
+                const canvas = document.getElementById(id);
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#ccc';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No hay datos disponibles', canvas.width/2, canvas.height/2);
+                }
+            });
+            
+            // Limpiar tabla
+            const tableContainer = document.getElementById('users-table');
+            if (tableContainer) {
+                tableContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No hay usuarios registrados</p>';
+            }
+        }
+        
+        // Función para descargar estadísticas
+        function downloadStats() {
+            const users = loadUsersData();
+            const stats = calculateStatistics(users);
+            
+            const statsData = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    totalUsers: stats.total,
+                    genders: stats.genders,
+                    ages: stats.ages,
+                    ageRanges: stats.ageRanges
+                },
+                users: users.map(u => ({
+                    name: u.name,
+                    email: u.email,
+                    gender: u.gender,
+                    age: u.age,
+                    createdAt: u.createdAt
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(statsData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `empathy-statistics-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Función legacy para compatibilidad
+        function updateStatistics() {
+            refreshDashboard();
+        }
+        
+        function forceUpdateStatistics() {
+            refreshDashboard();
+        }
+
+        // Inicializar dashboard y escuchar nuevos registros
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📊 Inicializando dashboard de estadísticas...');
+            
+            // FORZAR CREACIÓN DE DATOS FALSOS INMEDIATAMENTE
+            createFakeUsersData();
+            
+            // Esperar un poco para que se carguen los datos
+            setTimeout(() => {
+                console.log('� Iniciando actualización del dashboard...');
+                refreshDashboard();
+                
+                // Forzar actualización después de 1 segundo más
+                setTimeout(() => {
+                    console.log('📊 Forzando segunda actualización del dashboard...');
+                    refreshDashboard();
+                }, 1000);
+            }, 500);
+
+            // Actualizar dashboard cuando se muestra la sección
+            const statsSection = document.getElementById('estadisticas');
+            if (statsSection) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            if (statsSection.style.display !== 'none') {
+                                console.log('📊 Sección de estadísticas mostrada, actualizando dashboard...');
+                                setTimeout(() => refreshDashboard(), 200);
+                            }
+                        }
+                    });
+                });
+                observer.observe(statsSection, { attributes: true });
+            }
+
+            // Escuchar el evento de registro de usuario para actualizar dashboard en tiempo real
+            window.addEventListener('userRegistered', function(event) {
+                console.log('📊 Usuario registrado detectado, actualizando dashboard...', event.detail);
+                setTimeout(() => refreshDashboard(), 500);
+            });
+
+            // Escuchar cambios en localStorage (por ejemplo, desde otras pestañas)
+            window.addEventListener('storage', function(event) {
+                if (event.key === 'empathy_users') {
+                    console.log('📊 Cambios detectados en localStorage, actualizando dashboard...');
+                    setTimeout(() => refreshDashboard(), 500);
+                }
+            });
+
+            console.log('📊 Dashboard de estadísticas inicializado con datos falsos');
+        });
+        
+        // Función para crear datos falsos de usuarios - MEJORADA
+        function createFakeUsersData() {
+            console.log('🔧 Creando datos falsos de usuarios...');
+            
+            const fakeUsers = [
+                {
+                    id: 'fake1',
+                    name: 'María González',
+                    email: 'maria@empathy.com',
+                    password: 'hashed123',
+                    age: 25,
+                    gender: 'femenino',
+                    createdAt: '2024-01-15T10:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake2',
+                    name: 'Carlos Rodríguez',
+                    email: 'carlos@empathy.com',
+                    password: 'hashed456',
+                    age: 32,
+                    gender: 'masculino',
+                    createdAt: '2024-01-20T14:45:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake3',
+                    name: 'Ana López',
+                    email: 'ana@empathy.com',
+                    password: 'hashed789',
+                    age: 17,
+                    gender: 'femenino',
+                    createdAt: '2024-02-01T09:15:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake4',
+                    name: 'Juan Pérez',
+                    email: 'juan@empathy.com',
+                    password: 'hashed101',
+                    age: 45,
+                    gender: 'masculino',
+                    createdAt: '2024-02-10T16:20:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake5',
+                    name: 'Alex Torres',
+                    email: 'alex@empathy.com',
+                    password: 'hashed202',
+                    age: 22,
+                    gender: 'otro',
+                    createdAt: '2024-02-15T11:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake6',
+                    name: 'Sofia Martínez',
+                    email: 'sofia@empathy.com',
+                    password: 'hashed303',
+                    age: 16,
+                    gender: 'femenino',
+                    createdAt: '2024-02-20T13:45:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake7',
+                    name: 'Diego Herrera',
+                    email: 'diego@empathy.com',
+                    password: 'hashed404',
+                    age: 28,
+                    gender: 'masculino',
+                    createdAt: '2024-02-25T08:15:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake8',
+                    name: 'Valentina Silva',
+                    email: 'valentina@empathy.com',
+                    password: 'hashed505',
+                    age: 35,
+                    gender: 'femenino',
+                    createdAt: '2024-03-01T12:00:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake9',
+                    name: 'Camilo Vargas',
+                    email: 'camilo@empathy.com',
+                    password: 'hashed606',
+                    age: 19,
+                    gender: 'masculino',
+                    createdAt: '2024-03-05T15:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake10',
+                    name: 'Riley Johnson',
+                    email: 'riley@empathy.com',
+                    password: 'hashed707',
+                    age: 24,
+                    gender: 'otro',
+                    createdAt: '2024-03-10T10:45:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake11',
+                    name: 'Isabella García',
+                    email: 'isabella@empathy.com',
+                    password: 'hashed808',
+                    age: 15,
+                    gender: 'femenino',
+                    createdAt: '2024-03-15T14:20:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake12',
+                    name: 'Sebastián Ruiz',
+                    email: 'sebastian@empathy.com',
+                    password: 'hashed909',
+                    age: 41,
+                    gender: 'masculino',
+                    createdAt: '2024-03-20T09:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake13',
+                    name: 'Lucía Morales',
+                    email: 'lucia@empathy.com',
+                    password: 'hashed010',
+                    age: 29,
+                    gender: 'femenino',
+                    createdAt: '2024-03-25T11:15:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake14',
+                    name: 'Andrés Castro',
+                    email: 'andres@empathy.com',
+                    password: 'hashed111',
+                    age: 52,
+                    gender: 'masculino',
+                    createdAt: '2024-04-01T16:00:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake15',
+                    name: 'Taylor Smith',
+                    email: 'taylor@empathy.com',
+                    password: 'hashed212',
+                    age: 33,
+                    gender: 'otro',
+                    createdAt: '2024-04-05T13:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake16',
+                    name: 'Camila Jiménez',
+                    email: 'camila@empathy.com',
+                    password: 'hashed313',
+                    age: 21,
+                    gender: 'femenino',
+                    createdAt: '2024-04-10T16:45:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake17',
+                    name: 'Roberto Mendoza',
+                    email: 'roberto@empathy.com',
+                    password: 'hashed414',
+                    age: 38,
+                    gender: 'masculino',
+                    createdAt: '2024-04-15T12:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake18',
+                    name: 'Gabriela Flores',
+                    email: 'gabriela@empathy.com',
+                    password: 'hashed515',
+                    age: 27,
+                    gender: 'femenino',
+                    createdAt: '2024-04-20T14:15:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake19',
+                    name: 'Mateo Suárez',
+                    email: 'mateo@empathy.com',
+                    password: 'hashed616',
+                    age: 23,
+                    gender: 'masculino',
+                    createdAt: '2024-04-25T10:00:00Z',
+                    lastLogin: null,
+                    isActive: true
+                },
+                {
+                    id: 'fake20',
+                    name: 'Sam Wilson',
+                    email: 'sam@empathy.com',
+                    password: 'hashed717',
+                    age: 26,
+                    gender: 'otro',
+                    createdAt: '2024-04-30T11:30:00Z',
+                    lastLogin: null,
+                    isActive: true
+                }
+            ];
+            
+            // Guardar datos falsos en localStorage
+            localStorage.setItem('empathy_users', JSON.stringify(fakeUsers));
+            console.log('✅ Datos falsos creados y guardados:', fakeUsers.length + ' usuarios');
+            
+            // Verificar que se guardaron correctamente
+            const savedData = localStorage.getItem('empathy_users');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                console.log('✅ Verificación: Datos guardados correctamente:', parsedData.length + ' usuarios');
+            } else {
+                console.error('❌ Error: No se pudieron guardar los datos');
+            }
+        }
+
+        // Agregar estilos para las notificaciones y elementos nuevos
+        const additionalStyles = `
+            <style>
+                /* Estilos para usuarios recientes */
+                .recent-user-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 15px 20px;
+                    margin-bottom: 10px;
+                    background: rgba(255, 255, 255, 0.8);
+                    border-radius: 10px;
+                    border-left: 4px solid #4CAF50;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.2s ease;
+                }
+
+                .recent-user-item:hover {
+                    transform: translateX(5px);
+                }
+
+                .user-info {
+                    flex: 1;
+                }
+
+                .user-info strong {
+                    color: #2E7D32;
+                    font-size: 1.1rem;
+                    display: block;
+                    margin-bottom: 5px;
+                }
+
+                .user-details {
+                    color: #666;
+                    font-size: 0.9rem;
+                }
+
+                .user-date {
+                    color: #888;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                }
+
+                /* Estilos para las leyendas */
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 5px 10px;
+                    background: rgba(255, 255, 255, 0.8);
+                    border-radius: 8px;
+                    margin-bottom: 5px;
+                }
+
+                .legend-color {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    border: 2px solid rgba(255, 255, 255, 0.8);
+                }
+
+                .legend-label {
+                    font-size: 0.9rem;
+                    color: #555;
+                    font-weight: 500;
+                }
+
+                /* Estilos para la tabla de estadísticas */
+                .stats-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-family: 'Quicksand', sans-serif;
+                }
+
+                .stats-table th,
+                .stats-table td {
+                    padding: 12px 15px;
+                    text-align: left;
+                    border-bottom: 1px solid rgba(93, 78, 109, 0.1);
+                }
+
+                .stats-table th {
+                    background: linear-gradient(135deg, #5d4e6d, #4a3c57);
+                    color: white;
+                    font-weight: 600;
+                }
+
+                .stats-table tr:hover {
+                    background: rgba(93, 78, 109, 0.05);
+                }
+
+                .stats-table td:last-child {
+                    font-weight: 600;
+                    color: #4CAF50;
+                }
+
+                /* Animaciones para números */
+                @keyframes numberPulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+
+                .number-animated {
+                    animation: numberPulse 0.6s ease-in-out;
+                }
+
+                /* Animación de loading */
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+
+                /* Estilos para la ventana flotante del chatbot */
+                .chat-flotante {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    width: 320px;
+                    height: 480px;
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+                    z-index: 1000;
+                    overflow: hidden;
+                    border: 2px solid #9c27b0;
+                    animation: slideInUp 0.3s ease-out;
+                }
+
+                .chat-flotante.minimizado {
+                    height: 60px;
+                    animation: slideDown 0.3s ease-out;
+                }
+
+                .chat-flotante-header {
+                    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+                    color: white;
+                    padding: 15px 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: move;
+                    user-select: none;
+                }
+
+                .chat-flotante-titulo {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .chat-flotante-titulo h4 {
+                    margin: 0;
+                    font-size: 1rem;
+                    font-weight: 600;
+                }
+
+                .chat-status-indicator {
+                    width: 10px;
+                    height: 10px;
+                    background: #4CAF50;
+                    border-radius: 50%;
+                    animation: pulse 2s infinite;
+                }
+
+                .chat-flotante-controles {
+                    display: flex;
+                    gap: 5px;
+                }
+
+                .chat-control-btn {
+                    background: rgba(255, 255, 255, 0.2);
+                    border: none;
+                    color: white;
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                }
+
+                .chat-control-btn:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(1.1);
+                }
+
+                .chat-flotante-body {
+                    height: calc(100% - 60px);
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    overflow: hidden;
+                    background: white;
+                    display: flex;
+                    flex-direction: column;
+                    position: relative;
+                }
+
+                #n8n-chat-container {
+                    height: 100% !important;
+                    width: 100% !important;
+                    background: white !important;
+                    overflow: hidden !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    border: none !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                }
+
+                /* Forzar estilos en todos los elementos hijos del chatbot n8n */
+                #n8n-chat-container *,
+                #n8n-chat-container *::before,
+                #n8n-chat-container *::after {
+                    box-sizing: border-box !important;
+                    max-width: 100% !important;
+                }
+
+                /* Contenedor principal del chat n8n - más específico */
+                #n8n-chat-container > div,
+                #n8n-chat-container > div > div,
+                #n8n-chat-container [data-testid="chat-container"], 
+                #n8n-chat-container .chat-container,
+                #n8n-chat-container .n8n-chat,
+                #n8n-chat-container .n8n-chat-widget {
+                    height: 100% !important;
+                    width: 100% !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    background: white !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                }
+
+                /* Header del chat n8n */
+                #n8n-chat-container .chat-header,
+                #n8n-chat-container [data-testid="chat-header"] {
+                    flex-shrink: 0 !important;
+                    background: transparent !important;
+                    border-bottom: 1px solid #e0e0e0 !important;
+                    padding: 10px 15px !important;
+                    height: auto !important;
+                    min-height: 50px !important;
+                }
+
+                /* Área de mensajes del chat n8n */
+                #n8n-chat-container .chat-messages,
+                #n8n-chat-container [data-testid="chat-messages"],
+                #n8n-chat-container .messages-container,
+                #n8n-chat-container .conversation {
+                    flex: 1 !important;
+                    overflow-y: auto !important;
+                    padding: 10px 15px !important;
+                    background: white !important;
+                    height: auto !important;
+                    min-height: 0 !important;
+                }
+
+                /* Input del chat n8n */
+                #n8n-chat-container .chat-input,
+                #n8n-chat-container [data-testid="chat-input"],
+                #n8n-chat-container .input-container,
+                #n8n-chat-container .message-input {
+                    flex-shrink: 0 !important;
+                    padding: 10px 15px !important;
+                    background: white !important;
+                    border-top: 1px solid #e0e0e0 !important;
+                    height: auto !important;
+                    min-height: 60px !important;
+                }
+
+                /* Remover cualquier posicionamiento absoluto/fixed problemático */
+                #n8n-chat-container .chat-overlay,
+                #n8n-chat-container .chat-backdrop,
+                #n8n-chat-container .overlay {
+                    display: none !important;
+                }
+
+                /* Forzar que cualquier iframe ocupe todo el espacio */
+                #n8n-chat-container iframe {
+                    width: 100% !important;
+                    height: 100% !important;
+                    border: none !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                }
+
+                /* Resetear z-index para evitar conflictos */
+                #n8n-chat-container * {
+                    z-index: auto !important;
+                }
+
+                /* Estilos específicos para elementos n8n que pueden causar problemas */
+                #n8n-chat-container .n8n-chat-widget,
+                #n8n-chat-container .widget-container,
+                #n8n-chat-container .chat-widget {
+                    position: relative !important;
+                    transform: none !important;
+                    left: auto !important;
+                    right: auto !important;
+                    top: auto !important;
+                    bottom: auto !important;
+                }
+
+                /* Estilos adicionales para forzar alineación correcta */
+                #n8n-chat-container iframe {
+                    width: 100% !important;
+                    height: 100% !important;
+                    border: none !important;
+                }
+
+                /* Evitar problemas con z-index */
+                #n8n-chat-container * {
+                    z-index: unset !important;
+                }
+
+                /* Asegurar que el contenido no se salga del contenedor */
+                #n8n-chat-container,
+                #n8n-chat-container * {
+                    max-width: 100% !important;
+                    max-height: 100% !important;
+                }
+
+                /* Estilos para mensajes de carga centrados */
+                #n8n-chat-container .loading-message {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    height: 100% !important;
+                    width: 100% !important;
+                    text-align: center !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                }
+
+                /* Estilos adicionales para garantizar ocupación completa del espacio */
+                #n8n-chat-container .n8n-chat-embedded,
+                #n8n-chat-container .embedded-chat,
+                #n8n-chat-container .chat-embedded {
+                    height: 100% !important;
+                    width: 100% !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    flex: 1 !important;
+                }
+
+                /* Forzar que el contenido principal ocupe todo el espacio */
+                #n8n-chat-container > div:first-child,
+                #n8n-chat-container > div:only-child {
+                    height: 100% !important;
+                    width: 100% !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    flex: 1 !important;
+                }
+
+                /* Remover cualquier gap o spacing que pueda estar causando el problema */
+                #n8n-chat-container,
+                #n8n-chat-container * {
+                    gap: 0 !important;
+                    row-gap: 0 !important;
+                    column-gap: 0 !important;
+                }
+
+                /* Asegurar que no haya margins o paddings inesperados */
+                #n8n-chat-container > *:first-child {
+                    margin-top: 0 !important;
+                }
+
+                #n8n-chat-container > *:last-child {
+                    margin-bottom: 0 !important;
+                }
+
+                /* Animaciones suaves para el chat flotante */
+                @keyframes slideInUp {
+                    from {
+                        transform: translateY(20px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes slideDown {
+                    from {
+                        height: 480px;
+                    }
+                    to {
+                        height: 60px;
+                    }
+                }
+
+                /* Estilos básicos para el chat flotante */
+                .chat-flotante {
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    width: 320px;
+                    height: 480px;
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+                    z-index: 1000;
+                    overflow: hidden;
+                    border: 2px solid #9c27b0;
+                }
+
+                .chat-flotante.minimizado {
+                    height: 60px;
+                }
+
+                .chat-flotante-header {
+                    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+                    color: white;
+                    padding: 15px 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: move;
+                    user-select: none;
+                }
+
+                .chat-flotante-body {
+                    height: calc(100% - 60px);
+                    padding: 0;
+                    overflow: hidden;
+                    background: white;
+                }
+
+                .chat-control-btn {
+                    background: rgba(255, 255, 255, 0.2);
+                    border: none;
+                    color: white;
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .chat-control-btn:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                }
+
+                /* Icono flotante */
+                .chat-floating-icon {
+                    position: fixed !important;
+                    bottom: 30px !important;
+                    right: 30px !important;
+                    width: 60px !important;
+                    height: 60px !important;
+                    background: linear-gradient(135deg, #9c27b0, #7b1fa2) !important;
+                    border-radius: 50% !important;
+                    cursor: pointer !important;
+                    z-index: 9999 !important;
+                    box-shadow: 0 4px 20px rgba(156, 39, 176, 0.4) !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    transition: all 0.3s ease !important;
+                }
+
+                .chat-floating-icon:hover {
+                    transform: scale(1.1) !important;
+                    box-shadow: 0 6px 25px rgba(156, 39, 176, 0.6) !important;
+                }
+
+                .chat-icon-logo {
+                    width: 40px !important;
+                    height: 40px !important;
+                    border-radius: 50% !important;
+                    object-fit: cover !important;
+                    border: 2px solid white !important;
+                }
+
+                .chat-floating-icon.hidden {
+                    display: none !important;
+                }
+
+                /* Asegurar que el icono flotante esté siempre visible */
+                #chat-floating-icon {
+                    position: fixed !important;
+                    bottom: 30px !important;
+                    right: 30px !important;
+                    z-index: 99999 !important;
+                    display: flex !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    pointer-events: all !important;
+                }
+
+                /* Animación para el icono flotante */
+                @keyframes float {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-10px); }
+                }
+
+                .chat-floating-icon {
+                    animation: float 3s ease-in-out infinite !important;
+                }
+
+                .chat-floating-icon:hover {
+                    animation: none !important;
+                }
+
+                /* Estilos para botones del chat */
+                .btn-empathy {
+                    transition: all 0.3s ease;
+                    font-family: 'Quicksand', sans-serif;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                    border: none;
+                    border-radius: 25px;
+                    padding: 12px 25px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    color: white;
+                }
+
+                .btn-empathy:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+                }
+
+                .btn-empathy:active {
+                    transform: translateY(0);
+                }
+
+                .btn-empathy:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                    transform: none;
+                }
+
+                /* Estilos para el chatbot en la página principal */
+                .chatbot-section {
+                    background-color: #f5e6ff;
+                    padding: 80px 0;
+                    margin-top: 50px;
+                }
+
+                .chatbot-container {
+                    background-color: #ffffff;
+                    border-radius: 15px;
+                    padding: 30px;
+                    max-width: 800px;
+                    margin: auto;
+                    box-shadow: 0 0 20px rgba(93, 63, 211, 0.1);
+                }
+
+                .chatbot-container h2 {
+                    text-align: center;
+                    color: #5D3FD3;
+                    margin-bottom: 30px;
+                    font-size: 2rem;
+                    font-weight: 600;
+                }
+
+                #n8n-chat {
+                    width: 100%;
+                    max-width: 100%;
+                    height: 500px;
+                    margin: 20px auto;
+                    border: 2px solid #5D3FD3;
+                    border-radius: 15px;
+                    box-shadow: 0 0 15px rgba(93, 63, 211, 0.3);
+                    overflow: hidden;
+                }
+
+                /* Estilos para la sección del chatbot */
+                .chat-header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+
+                .chat-header h2 {
+                    color: #5D3FD3;
+                    font-size: 2.5rem;
+                    margin-bottom: 15px;
+                    font-weight: 600;
+                }
+
+                .chat-header p {
+                    color: #666;
+                    font-size: 1.1rem;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    line-height: 1.6;
+                }
+
+                .chat-container {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 15px;
+                    overflow: hidden;
+                    box-shadow: 0 0 20px rgba(93, 63, 211, 0.1);
+                    height: 600px;
+                    border: 2px solid #5D3FD3;
+                }
+
+                #n8n-chat {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                    border-radius: 15px;
+                }
+
+                /* Responsive para móviles */
+                @media (max-width: 768px) {
+                    .chat-header h2 {
+                        font-size: 2rem;
+                    }
+                    
+                    .chat-container {
+                        height: 500px;
+                        margin: 0 10px;
+                    }
+                }
+            </style>
+        `;
+
+        // Insertar estilos adicionales
+        document.head.insertAdjacentHTML('beforeend', additionalStyles);
+
+        // ===== SISTEMA DE CHATBOT DIRECTO EN LA PÁGINA =====
+        
+        // Función para inicializar el chatbot directamente en la página
+        function inicializarChatbot() {
+            console.log('🤖 Inicializando chatbot Violet...');
+            
+            // Cargar CSS del chatbot
+            const linkCSS = document.createElement('link');
+            linkCSS.href = 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css';
+            linkCSS.rel = 'stylesheet';
+            document.head.appendChild(linkCSS);
+            
+            // Importar y crear el chat
+            import('https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js')
+                .then(({ createChat }) => {
+                    createChat({
+                        webhookUrl: 'https://karenospi.app.n8n.cloud/webhook/d922a1f4-8307-4ca7-9f6e-1a600c7f0a64/chat',
+                        webhookConfig: {
+                            method: 'POST',
+                            headers: {}
+                        },
+                        target: '#n8n-chat',
+                        mode: 'embedded',
+                        chatInputKey: 'chatInput',
+                        chatSessionKey: 'sessionId',
+                        loadPreviousSession: true,
+                        metadata: {},
+                        showWelcomeScreen: false,
+                        defaultLanguage: 'es',
+                        initialMessages: [
+                            'Hola! 👋',
+                            'Soy 𝑽𝒊𝒐𝒍𝒆𝒕. ¿Quieres contarme cómo te sientes hoy?'
+                        ],
+                        i18n: {
+                            es: {
+                                title: 'Empathy - Chat de Apoyo',
+                                subtitle: 'Bienvenid@ a tu espacio seguro 💜',
+                                footer: '',
+                                getStarted: 'Nueva conversación',
+                                inputPlaceholder: 'Mensaje...',
+                            }
+                        }
+                    });
+                    
+                    console.log('✅ Chatbot Violet inicializado correctamente');
+                })
+                .catch(error => {
+                    console.error('❌ Error al inicializar Violet:', error);
+                    const container = document.getElementById('n8n-chat');
+                    if (container) {
+                        container.innerHTML = '<div style="padding: 20px; text-align: center; color: #ff6b6b; font-family: Arial, sans-serif;"><div style="margin-bottom: 10px;">⚠️</div><div>Error al conectar con Violet</div><div style="margin-top: 10px;"><button onclick="inicializarChatbot()" style="background: #5D3FD3; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer;">Reintentar</button></div></div>';
+                    }
+                });
+        }
+
+        // Inicializar el chatbot cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el sistema de estadísticas usando la función global
+            if (window.initializeStatisticsSystem) {
+                window.initializeStatisticsSystem();
+                console.log('📊 Sistema de estadísticas inicializado en app.html');
+            } else {
+                console.warn('⚠️ Sistema de estadísticas no disponible. Verificar que real-time-stats.js esté cargado.');
+            }
+            
+            // Esperar un poco para que la página esté completamente cargada
+            setTimeout(() => {
+                inicializarChatbot();
+            }, 1000);
+        });
+
+        // Exponer la función globalmente para el botón de reintentar
+        window.inicializarChatbot = inicializarChatbot;
+
+        // Función para ajustar estilos del chatbot después de cargar
+        function ajustarEstilosChatbot() {
+            try {
+                console.log('🎨 Ajustando estilos del chatbot...');
+                
+                const container = document.getElementById('n8n-chat-container');
+                if (!container) {
+                    console.warn('⚠️ Contenedor n8n no encontrado');
+                    return;
+                }
+                
+                // Aplicar estilos al contenedor principal de forma más agresiva
+                container.style.cssText = `
+                    height: 100% !important;
+                    width: 100% !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    background: white !important;
+                    overflow: hidden !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    border: none !important;
+    </script>
+
+    <!-- Script del chatbot Violet flotante -->
+    <script>
+        // Cargar CSS del chatbot n8n
+        const chatCSS = document.createElement('link');
+        chatCSS.href = 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css';
+        chatCSS.rel = 'stylesheet';
+        document.head.appendChild(chatCSS);
+
+        // Cargar e inicializar el chatbot flotante
+        const chatScript = document.createElement('script');
+        chatScript.type = 'module';
+        chatScript.textContent = `
+            import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+            createChat({
+                webhookUrl: 'https://karenospi.app.n8n.cloud/webhook/d922a1f4-8307-4ca7-9f6e-1a600c7f0a64/chat',
+                webhookConfig: {
+                    method: 'POST',
+                    headers: {}
+                },
+                target: '#n8n-chat-container',
+                mode: 'window',
+                chatInputKey: 'chatInput',
+                chatSessionKey: 'sessionId',
+                loadPreviousSession: true,
+                metadata: {},
+                showWelcomeScreen: false,
+                defaultLanguage: 'es',
+                initialMessages: [
+                    'Hola! 👋',
+                    'Soy 𝑽𝒊𝒐𝒍𝒆𝒕. ¿Quieres contarme cómo te sientes hoy?'
+                ],
+                i18n: {
+                    es: {
+                        title: 'Empathy - Chat de Apoyo',
+                        subtitle: 'Bienvenid@ a tu espacio seguro 💜',
+                        footer: '',
+                        getStarted: 'Nueva conversación',
+                        inputPlaceholder: 'Mensaje...',
+                    },
+                },
+            });
+        `;
+        document.head.appendChild(chatScript);
+
+        console.log('🤖 Chatbot Violet flotante inicializado');
+    </script>
+
+</body>
+</html>
