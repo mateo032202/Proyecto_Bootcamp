@@ -3,6 +3,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,400;1,600;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,400;1,600;1,700;1,800;1,900&display=swap');
 
 @font-face {
     font-family: 'Super Adorable';
@@ -17,43 +20,71 @@
     box-sizing: border-box;
 }
 
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> 375bb27b890326cd600cf91ff2f94e565e6fae03
 body {
     font-family: 'Quicksand', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f9f7f6;
     color: #333;
     line-height: 1.6;
 }
-<<<<<<< HEAD
+
+/* Ancho del cuerpo - Integrado de tus compañeros */
+.main-container {
+    background: rgba(214, 235, 245, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin: 20px auto;
+    max-width: 80%;
+    padding: 0;
+    overflow: hidden;
+}
 
 /* === HEADER Y NAVEGACIÓN === */
-=======
-/*Ancho del cuerpo*/
-.main-container {
-      background: rgba(214, 235, 245, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: var(--border-radius);
-      box-shadow: var(--card-shadow);
-      margin: 20px auto;
-      max-width: 80%;
-      padding: 0;
-      overflow: hidden;
-    }
-
->>>>>>> 375bb27b890326cd600cf91ff2f94e565e6fae03
 header {
     background: linear-gradient(135deg, #f6e5f5, #e8f0ff);
     color: #5d4e6d;
-    padding: 1rem 2rem;
+    padding: 1.2rem 2rem; /* Aumentar padding vertical para más espacio */
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* === ESTILOS PARA CONTENIDO DE CARTAS - RESTRICCIÓN MÁXIMA === */
+.testimonio-contenido {
+    font-family: 'Quicksand', sans-serif !important;
+    color: #333 !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    overflow: hidden !important;
+    max-height: 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2px !important;
+    margin: 0 !important;
+}
+
+/* Asegurar que el foreignObject tenga dimensiones fijas */
+svg foreignObject {
+    overflow: hidden !important;
+    width: 180px !important;
+    height: 70px !important;
+}
+
+/* Contenido dentro del foreignObject */
+foreignObject div {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 nav {
@@ -62,6 +93,7 @@ nav {
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
+    gap: 2rem; /* Agregar espacio entre logo y navegación */
 }
 
 .nav-logo {
@@ -80,7 +112,29 @@ nav {
     gap: 0.1em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1px 0 #fff;
+    /* Eliminar completamente todos los efectos */
+    text-shadow: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+}
+
+/* Asegurar que no haya efectos en hover */
+.site-title:hover,
+.site-title:hover .empathy-letter,
+.site-title:hover .empathy-e,
+.site-title:hover .empathy-m,
+.site-title:hover .empathy-p,
+.site-title:hover .empathy-a,
+.site-title:hover .empathy-t,
+.site-title:hover .empathy-h,
+.site-title:hover .empathy-y {
+    text-shadow: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
 }
 
 .empathy-letter,
@@ -95,9 +149,12 @@ nav {
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
-    text-shadow: none;
-    animation: none;
-    filter: none;
+    text-shadow: none !important;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    /* Eliminar cualquier efecto de neón o iluminación */
 }
 
 .empathy-e { color: #71f38f; }
@@ -111,9 +168,10 @@ nav {
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem; /* Reducir un poco el gap entre enlaces */
     align-items: center;
     margin-left: auto;
+    flex-wrap: wrap; /* Permitir wrap en pantallas pequeñas */
 }
 
 .nav-links a {
@@ -121,9 +179,10 @@ nav {
     color: #5d4e6d;
     font-weight: 600;
     transition: color 0.3s ease;
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem; /* Aumentar padding para mejor espaciado */
     border-radius: 8px;
     transition: all 0.3s ease;
+    white-space: nowrap; /* Evitar que se rompan las líneas */
 }
 
 .nav-links a:hover {
@@ -194,60 +253,47 @@ nav {
     position: relative;
     display: inline-block;
     overflow: visible;
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.06));
-    animation: empathy-glow 2.8s ease-in-out infinite;
-    text-shadow:
-        0 1px 2px rgba(0,0,0,0.08),
-        0 0 4px currentColor,
-        0 0 1px #fff;
+    /* Eliminar completamente todos los efectos de neón */
+    animation: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    transition: none !important;
+    box-shadow: none !important;
 }
 
-.site-title .empathy-e { animation-delay: 0s; }
-.site-title .empathy-m { animation-delay: 0.2s; }
-.site-title .empathy-p { animation-delay: 0.4s; }
-.site-title .empathy-a { animation-delay: 0.6s; }
-.site-title .empathy-t { animation-delay: 0.8s; }
-.site-title .empathy-h { animation-delay: 1s; }
-.site-title .empathy-y { animation-delay: 1.2s; }
+/* Delays de animación removidos */
 
-@keyframes empathy-glow {
-    0%, 100% {
-        text-shadow:
-            0 1px 2px rgba(0,0,0,0.08),
-            0 0 4px currentColor,
-            0 0 1px #fff;
-        filter: brightness(1);
-    }
-    50% {
-        text-shadow:
-            0 1px 2px rgba(0,0,0,0.08),
-            0 0 8px currentColor,
-            0 0 12px currentColor,
-            0 0 1px #fff;
-        filter: brightness(1.2);
-    }
-}
-<<<<<<< HEAD
+/* Animación de brillo removida */
 
+/* Navegación responsiva */
 @media (max-width: 768px) {
+    header {
+        padding: 1rem; /* Reducir padding en móviles */
+    }
     nav {
         flex-direction: column;
         align-items: center;
-        padding: 1rem;
+        gap: 1rem; /* Espacio entre logo y navegación en móviles */
     }
     .nav-links {
-        margin-top: 1rem;
+        margin-top: 0; /* Quitar margin-top ya que usamos gap */
         flex-wrap: wrap;
         justify-content: center;
+        gap: 0.5rem; /* Menor gap en móviles */
     }
     .nav-links li {
-        margin: 0.5rem;
+        margin: 0.3rem; /* Reducir margin */
+    }
+    .nav-links a {
+        padding: 0.4rem 0.8rem; /* Reducir padding en móviles */
+        font-size: 0.9rem; /* Texto un poco más pequeño */
     }
     .site-title {
         font-size: 2rem;
     }
-=======
-/*Sección de mision y vision*/
+}
+
+/*Sección de misión y visión*/
 .nosotrosTit {
     font-family: 'Super Adorable', cursive;
     font-size: 2.5rem;
@@ -262,7 +308,6 @@ nav {
     background: #f9f7f6;
     padding: 40px 20px;
     text-align: center;
->>>>>>> 375bb27b890326cd600cf91ff2f94e565e6fae03
 }
 
 /* === SECCIÓN INICIO === */
@@ -348,13 +393,35 @@ nav {
     min-height: 100vh;
 }
 
-.testimonios-section h2 {
-    font-family: 'Super Adorable', cursive;
-    font-size: 3rem;
-    color: #5d4e6d;
-    text-align: center;
-    margin-bottom: 50px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+@keyframes smoothSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInGradual {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.8;
+    }
+}
+
+@keyframes modernFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .testimonios-container {
@@ -371,6 +438,8 @@ nav {
     justify-content: center;
     align-items: center;
     perspective: 1000px;
+    box-shadow: none !important;
+    background: none !important;
 }
 /*contenido */
 .contenido{
@@ -391,22 +460,17 @@ nav {
     height: auto;
     cursor: pointer;
     transition: transform 0.3s ease;
-    filter: drop-shadow(0 8px 25px rgba(0,0,0,0.15));
+    box-shadow: none !important;
+    filter: none !important;
+    background: none !important;
 }
 
-.sobre-cerrado:hover {
-    transform: scale(1.05) translateY(-10px);
+.sobre-cerrado {
+    cursor: pointer;
+    transition: transform 0.3s ease;
 }
 
-.sobre-cerrado:hover .solapa-sobre {
-    transform: rotateX(-180deg);
-    transform-origin: 200px 120px;
-}
-
-.sobre-cerrado:hover .carta-contenido {
-    transform: translateY(-160px);
-    opacity: 1;
-}
+/* Eliminado hover para solapa y carta - ahora se maneja con click */
 
 .carta-contenido {
     transition: all 0.6s ease;
@@ -858,11 +922,11 @@ nav {
         font-size: 2.5rem;
     }
     
-    .testimonios-section h2,
     #recursos h2,
     #contacto h2,
     #chat h2 {
         font-size: 2.5rem;
+        letter-spacing: 1px;
     }
     
     .contenido {
@@ -948,7 +1012,8 @@ nav {
     transition: opacity 0.3s ease;
 }
 
-.sobre-cerrado:hover::before {
+/* La animación shimmer ahora solo sucede con click */
+.sobre-cerrado.activo::before {
     opacity: 1;
     animation: sobre-shimmer 1.5s ease-in-out;
 }
@@ -960,32 +1025,10 @@ nav {
     transform: translateY(0px);
 }
 
-<<<<<<< HEAD
-/* Carta sale completamente del sobre en hover */
-.sobre-cerrado:hover .carta-contenido {
-    transform: translateY(-160px);
-    opacity: 1;
-}
-
-/* Animación de la solapa */
-.sobre-cerrado:hover .solapa-sobre {
-    transform: rotateX(-180deg);
-    transform-origin: 200px 120px;
-}
-
 /* El sello se mueve a la parte superior de la carta cuando sale */
 .sobre-cerrado circle,
 .sobre-cerrado image {
     transition: transform 0.8s ease;
-}
-
-/* Cuando sale la carta, el sello se posiciona dentro de la parte superior de la carta */
-.sobre-cerrado:hover circle {
-    transform: translateY(-140px);
-}
-
-.sobre-cerrado:hover image {
-    transform: translateY(-140px);
 }
 
 /* Efecto de profundidad para las cartas */
@@ -1033,19 +1076,19 @@ nav {
 .testimonios-container:hover::before {
     opacity: 1;
 }
-=======
+
+/* Estilos adicionales de testimonios */
 .testimonio-card__body {
     position: absolute;
-    left: 0; right: 0; bottom: 0;
+    left: 0; 
+    right: 0; 
+    bottom: 0;
     width: 100%;
     height: 110px;
-    background: linear-gradient(180deg, #f7c873 80%)
+    background: linear-gradient(180deg, #f7c873 80%);
 }
 
-
-    /*Seccion de contacto */
-
-    
+/* Sección de contacto */
 .contact-section {
     padding: 2rem;
     max-width: 600px;
@@ -1054,21 +1097,21 @@ nav {
     border: 2px solid #ffcce5;
     border-radius: 1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .contact-form {
+}
+
+.contact-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-  
-  .contact-form label {
+}
+
+.contact-form label {
     font-weight: 600;
     color: #5d4e6d;
-  }
-  
-  .contact-form input,
-  .contact-form textarea {
+}
+
+.contact-form input,
+.contact-form textarea {
     padding: 0.7rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -1076,14 +1119,14 @@ nav {
     font-size: 1rem;
     width: 100%;
     background-color: #fff;
-  }
-  
-  .contact-form textarea {
+}
+
+.contact-form textarea {
     resize: vertical;
     min-height: 100px;
-  }
-  
-  .contact-form button {
+}
+
+.contact-form button {
     background-color: #a678e2;
     color: white;
     border: none;
@@ -1092,41 +1135,364 @@ nav {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
-  
-  .contact-form button:hover {
+}
+
+.contact-form button:hover {
     background-color: #8e57c7;
-  }
-  .form-container {
+}
+
+.form-container {
     display: flex;
     gap: 1rem;
     align-items: flex-start;
     flex-wrap: wrap;
-  }
-  
-  .form-image-lateral {
+}
+
+.form-image-lateral {
     max-width: 180px;
     border-radius: 12px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
+}
 
-  
 .hidden {
     display: none;
-  }
-  .fade-in {
+}
+
+.fade-in {
     animation: fadeIn 0.6s ease-in-out forwards;
-  }
-  
-  @keyframes fadeIn {
+}
+
+@keyframes fadeIn {
     0% {
-      opacity: 0;
-      transform: translateY(20px);
+        opacity: 0;
+        transform: translateY(20px);
     }
     100% {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
-  
->>>>>>> 375bb27b890326cd600cf91ff2f94e565e6fae03
+}
+
+/* === ELIMINACIÓN ESPECÍFICA DEL TEXTO "ANA M." PROBLEMÁTICO === */
+
+/* Ocultar específicamente elementos de testimonio que aparezcan fuera de la sección testimonios */
+#nosotros svg text[font-family*="Great Vibes"],
+#nosotros svg text[font-family*="Dancing Script"],
+#nosotros .testimonio-firma,
+#nosotros [class*="testimonio"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* === ANIMACIONES PARA SOBRES CON CLICK === */
+/* Estas clases reemplazan la funcionalidad hover con click */
+
+/* Clase activa para cuando se hace click en el sobre */
+.sobre-cerrado.activo {
+    transform: scale(1.05) translateY(-10px);
+    filter: drop-shadow(0 15px 35px rgba(0,0,0,0.25));
+}
+
+/* La solapa se gira cuando se activa */
+.sobre-cerrado.activo .solapa-sobre {
+    transform: rotateX(-180deg);
+    transform-origin: 200px 120px;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* La carta sale cuando se activa */
+.sobre-cerrado.activo .carta-contenido {
+    transform: translateY(-160px);
+    opacity: 1;
+    transition: all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s;
+}
+
+/* El sello se mueve con la carta cuando se activa */
+.sobre-cerrado.activo circle {
+    transform: translateY(-140px);
+    transition: transform 0.8s ease;
+}
+
+.sobre-cerrado.activo image {
+    transform: translateY(-140px);
+    transition: transform 0.8s ease;
+}
+
+/* Hover sutil eliminado, ahora solo reacciona al click */
+.sobre-cerrado {
+    transform: scale(1);
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Mejorar la indicación de que los sobres son interactivos */
+.sobre-cerrado {
+    cursor: pointer;
+}
+
+/* Añadir efecto de pulse para indicar que es clickeable */
+@keyframes pulse-subtle {
+    0% {
+        box-shadow: 0 0 0 0 rgba(164, 140, 164, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(164, 140, 164, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(164, 140, 164, 0);
+    }
+}
+
+/* El efecto pulse ahora ocurre solo cuando el sobre está inactivo para indicar clickeable */
+.sobre-cerrado:not(.activo)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70%;
+    height: 70%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    animation: pulse-subtle 2s infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ========================================
+   CONFIGURACIÓN BÁSICA PARA SOBRES (SIN HOVER)
+   ======================================== */
+
+/* Configuración básica del sobre - SIN efectos hover */
+.sobre-cerrado {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Configuración básica del contenedor */
+.testimonio-carta-wrapper {
+    padding: 20px;
+    position: relative;
+    display: inline-block;
+}
+
+/* Estado activo para animaciones de click */
+.sobre-cerrado.activo {
+    transform: none !important;
+    filter: none !important;
+}
+
+.sobre-cerrado.activo * {
+    filter: none !important;
+}
+
+/* === SELECTOR DE COLORES PASTELES PARA SOBRES === */
+.sobre-color-selector {
+    margin-top: 10px;
+}
+
+.colores-pasteles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 200px;
+    margin-bottom: 15px;
+}
+
+.color-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected {
+    border-color: #A48CA4;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(164, 140, 164, 0.4);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #A48CA4;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+}
+
+.color-selected-text {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 8px;
+}
+
+/* Efecto de ripple al hacer click en colores */
+.color-option::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(164, 140, 164, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.color-option:active::before {
+    width: 100px;
+    height: 100px;
+}
+
+/* Responsive para selector de colores */
+@media (max-width: 768px) {
+    .colores-pasteles {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 240px;
+    }
+    
+    .color-option {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* === ESTILOS PARA BOTÓN CREAR TESTIMONIO === */
+#btn-crear-testimonio {
+    background: linear-gradient(135deg, #4A148C, #1A237E);
+    color: white;
+    border: none;
+    padding: 18px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(74, 20, 140, 0.3);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    min-width: 200px;
+    z-index: 1;
+}
+
+#btn-crear-testimonio::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #6A1B9A, #3F51B5);
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+#btn-crear-testimonio:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(74, 20, 140, 0.4), 
+                0 0 20px rgba(106, 27, 154, 0.3);
+    color: #fff;
+}
+
+#btn-crear-testimonio:hover::before {
+    left: 0;
+}
+
+#btn-crear-testimonio:active {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 5px 15px rgba(74, 20, 140, 0.5);
+}
+
+/* Efecto de brillo adicional */
+#btn-crear-testimonio::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#btn-crear-testimonio:hover::after {
+    animation: shine 0.8s ease-in-out;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    #btn-crear-testimonio {
+        padding: 15px 30px;
+        font-size: 1rem;
+        min-width: 180px;
+    }
+}
+
+/* === ESTILOS PARA ESTADÍSTICAS === */
+/* Estilos para gráficas responsivas */
+#estadisticas canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    #estadisticas {
+        padding: 40px 10px !important;
+    }
+    
+    #estadisticas h2 {
+        font-size: 2rem !important;
+    }
+    
+    #estadisticas > div > div:first-child > div {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    }
+    
+    #estadisticas > div > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+    }
+    
+    #estadisticas canvas {
+        width: 200px !important;
+        height: 200px !important;
+    }
+}
+
+

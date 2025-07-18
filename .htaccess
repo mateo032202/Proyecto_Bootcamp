@@ -1,0 +1,13 @@
+# Configuración de redirección para Empathy
+DirectoryIndex index.html
+
+# Redireccionar a index.html si no hay archivo especificado
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^$ index.html [L]
+
+# Headers de seguridad
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"

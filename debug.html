@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Sesión - Empathy</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Panel de Debug - Empathy</h1>
+        <p>Usa este panel para limpiar sesiones y probar el flujo de autenticación</p>
+        
+        <button onclick="clearSession()">🗑️ Limpiar Sesión</button>
+        <button onclick="goToMain()">🏠 Ir al Inicio</button>
+        <button onclick="goToLogin()">🔐 Ir al Login</button>
+        <button onclick="showSessionInfo()">ℹ️ Ver Info de Sesión</button>
+        
+        <div id="info" style="margin-top: 20px; font-size: 14px;"></div>
+    </div>
+
+    <script>
+        function clearSession() {
+            localStorage.removeItem('empathy_session');
+            localStorage.removeItem('empathy_users');
+            localStorage.removeItem('userProfilePic');
+            document.getElementById('info').innerHTML = '✅ Sesión limpiada completamente';
+        }
+
+        function goToMain() {
+            window.location.href = 'index.html';
+        }
+
+        function goToLogin() {
+            window.location.href = 'auth.html';
+        }
+
+        function showSessionInfo() {
+            const session = localStorage.getItem('empathy_session');
+            const users = localStorage.getItem('empathy_users');
+            const info = document.getElementById('info');
+            
+            if (session) {
+                try {
+                    const sessionData = JSON.parse(session);
+                    info.innerHTML = `
+                        <strong>Sesión activa:</strong><br>
+                        Usuario ID: ${sessionData.userId}<br>
+                        Expira: ${new Date(sessionData.expiresAt).toLocaleString()}
+                    `;
+                } catch (e) {
+                    info.innerHTML = '❌ Sesión corrupta detectada';
+                }
+            } else {
+                info.innerHTML = '❌ No hay sesión activa';
+            }
+        }
+
+        // Mostrar info automáticamente al cargar
+        window.onload = showSessionInfo;
+    </script>
+</body>
+</html>

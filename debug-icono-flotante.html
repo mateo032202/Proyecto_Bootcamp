@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Icono Flotante Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f6e5f5, #e8f0ff);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #5D3FD3;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #5D3FD3;
+            margin-bottom: 20px;
+        }
+
+        .debug-info h3 {
+            color: #5D3FD3;
+            margin-top: 0;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .test-area {
+            border: 2px dashed #5D3FD3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Estilos del icono flotante */
+        .chat-floating-icon {
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 30px !important;
+            width: 60px !important;
+            height: 60px !important;
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2) !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            z-index: 99999 !important;
+            box-shadow: 0 4px 20px rgba(156, 39, 176, 0.4) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .chat-floating-icon:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 25px rgba(156, 39, 176, 0.6) !important;
+        }
+
+        .chat-icon-logo {
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 2px solid white !important;
+        }
+
+        /* Animación flotante */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .chat-floating-icon {
+            animation: float 3s ease-in-out infinite !important;
+        }
+
+        .chat-floating-icon:hover {
+            animation: none !important;
+        }
+
+        #log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug - Icono Flotante Chatbot</h1>
+        
+        <div class="debug-info">
+            <h3>Estado del Icono Flotante</h3>
+            <div id="icon-status">
+                <span>Verificando...</span>
+            </div>
+        </div>
+
+        <div class="test-area">
+            <h3>Área de Prueba</h3>
+            <p>El icono flotante debería aparecer en la esquina inferior derecha</p>
+            <button class="btn" onclick="testIcon()">🔍 Verificar Icono</button>
+            <button class="btn" onclick="createIcon()">➕ Crear Icono</button>
+            <button class="btn" onclick="removeIcon()">❌ Eliminar Icono</button>
+            <button class="btn" onclick="clearLog()">🧹 Limpiar Log</button>
+        </div>
+
+        <div id="log"></div>
+    </div>
+
+    <!-- Icono flotante -->
+    <div id="chat-floating-icon" class="chat-floating-icon" onclick="testClick()">
+        <img src="images/logo.png" alt="Chatbot" class="chat-icon-logo">
+    </div>
+
+    <script>
+        // Función para agregar logs
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Función para verificar el estado del icono
+        function checkIconStatus() {
+            const icon = document.getElementById('chat-floating-icon');
+            const statusDiv = document.getElementById('icon-status');
+            
+            if (icon) {
+                const styles = window.getComputedStyle(icon);
+                const display = styles.display;
+                const visibility = styles.visibility;
+                const opacity = styles.opacity;
+                const zIndex = styles.zIndex;
+                const position = styles.position;
+                
+                let status = 'success';
+                let message = 'Icono encontrado y visible';
+                
+                if (display === 'none' || visibility === 'hidden' || opacity === '0') {
+                    status = 'error';
+                    message = 'Icono encontrado pero no visible';
+                }
+                
+                statusDiv.innerHTML = `
+                    <span class="status ${status}">${message}</span><br>
+                    <small>
+                        Display: ${display} | Visibility: ${visibility} | Opacity: ${opacity}<br>
+                        Position: ${position} | Z-Index: ${zIndex}
+                    </small>
+                `;
+                
+                log(`Estado del icono: ${message}`);
+                log(`Propiedades CSS: display=${display}, visibility=${visibility}, opacity=${opacity}, zIndex=${zIndex}`);
+            } else {
+                statusDiv.innerHTML = '<span class="status error">Icono no encontrado</span>';
+                log('ERROR: Icono flotante no encontrado en el DOM');
+            }
+        }
+
+        // Función para probar el icono
+        function testIcon() {
+            log('🔍 Iniciando prueba del icono...');
+            checkIconStatus();
+            
+            const icon = document.getElementById('chat-floating-icon');
+            if (icon) {
+                const rect = icon.getBoundingClientRect();
+                log(`Posición del icono: left=${rect.left}, top=${rect.top}, right=${rect.right}, bottom=${rect.bottom}`);
+                log(`Dimensiones: width=${rect.width}, height=${rect.height}`);
+            }
+        }
+
+        // Función para crear el icono
+        function createIcon() {
+            log('➕ Creando icono flotante...');
+            
+            // Eliminar icono existente si existe
+            const existingIcon = document.getElementById('chat-floating-icon');
+            if (existingIcon) {
+                existingIcon.remove();
+                log('Icono existente eliminado');
+            }
+            
+            // Crear nuevo icono
+            const newIcon = document.createElement('div');
+            newIcon.id = 'chat-floating-icon';
+            newIcon.className = 'chat-floating-icon';
+            newIcon.onclick = testClick;
+            
+            const img = document.createElement('img');
+            img.src = 'images/logo.png';
+            img.alt = 'Chatbot';
+            img.className = 'chat-icon-logo';
+            
+            newIcon.appendChild(img);
+            document.body.appendChild(newIcon);
+            
+            log('✅ Icono creado exitosamente');
+            
+            // Forzar estilos
+            setTimeout(() => {
+                newIcon.style.cssText = `
+                    position: fixed !important;
+                    bottom: 30px !important;
+                    right: 30px !important;
+                    width: 60px !important;
+                    height: 60px !important;
+                    background: linear-gradient(135deg, #9c27b0, #7b1fa2) !important;
+                    border-radius: 50% !important;
+                    cursor: pointer !important;
+                    z-index: 99999 !important;
+                    box-shadow: 0 4px 20px rgba(156, 39, 176, 0.4) !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                `;
+                log('🎨 Estilos forzados aplicados');
+                checkIconStatus();
+            }, 100);
+        }
+
+        // Función para eliminar el icono
+        function removeIcon() {
+            log('❌ Eliminando icono flotante...');
+            const icon = document.getElementById('chat-floating-icon');
+            if (icon) {
+                icon.remove();
+                log('✅ Icono eliminado');
+            } else {
+                log('⚠️ No se encontró icono para eliminar');
+            }
+            checkIconStatus();
+        }
+
+        // Función para limpiar el log
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('🧹 Log limpiado');
+        }
+
+        // Función para probar el click
+        function testClick() {
+            log('🖱️ Click en icono flotante detectado');
+            alert('¡Icono flotante funcionando correctamente! 🎉');
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Página cargada - Iniciando debug...');
+            checkIconStatus();
+            
+            // Verificar periódicamente
+            setInterval(checkIconStatus, 5000);
+        });
+
+        // Verificar cambios en el DOM
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.target.id === 'chat-floating-icon') {
+                    log('🔄 Cambio detectado en el icono flotante');
+                    checkIconStatus();
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+    </script>
+</body>
+</html>
